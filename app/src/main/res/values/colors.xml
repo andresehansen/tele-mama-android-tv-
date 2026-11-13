@@ -1,0 +1,6 @@
+<resources>
+    <color name="primary">#080c14</color>
+    <color name="accent">#facc15</color>
+    <color name="background">#080c14</color>
+    <color name="card_bg">#1e293b</color>
+</resources>

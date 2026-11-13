@@ -1,0 +1,96 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    
+    <!-- Fondo del Banner -->
+    <path
+        android:fillColor="#090d16"
+        android:pathData="M0,0h320v180h-320z"/>
+
+    <!-- Detalle decorativo superior -->
+    <path
+        android:fillColor="#0284c7"
+        android:pathData="M0,0h320v6h-320z"/>
+
+    <!-- Resplandor circular de fondo -->
+    <path
+        android:fillColor="#1e293b"
+        android:pathData="M240,90m-60,0a60,60 0,1,1 120,0a60,60 0,1,1 -120,0"/>
+
+    <!-- Silueta de Televisor TV -->
+    <path
+        android:fillColor="#1e293b"
+        android:strokeColor="#38bdf8"
+        android:strokeWidth="4"
+        android:pathData="M35,42h85a10,10 0 0 1 10,10v65a10,10 0 0 1 -10,10h-85a10,10 0 0 1 -10,-10v-65a10,10 0 0 1 10,-10z"/>
+    
+    <!-- Pantalla del TV -->
+    <path
+        android:fillColor="#0284c7"
+        android:pathData="M42,50h68a4,4 0 0 1 4,4v50a4,4 0 0 1 -4,4h-68a4,4 0 0 1 -4,-4v-50a4,4 0 0 1 4,-4z"/>
+
+    <!-- Antenitas / Ondas de señal -->
+    <path
+        android:strokeColor="#facc15"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M60,32L77,42L95,32"/>
+
+    <!-- Botones laterales del TV -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M121,62m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
+    <path
+        android:fillColor="#10b981"
+        android:pathData="M121,76m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
+
+    <!-- Base de la TV -->
+    <path
+        android:strokeColor="#64748b"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M65,127L58,138M90,127L97,138"/>
+
+    <!-- Texto decorativo: MI TELE -->
+    <!-- M -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M160,82L160,56L168,72L176,56L176,82L171,82L171,64L168,71L163,64L163,82Z"/>
+    <!-- I -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M183,82L183,56L189,56L189,82Z"/>
+    
+    <!-- TELE -->
+    <!-- T -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M200,56L214,56L214,61L209,61L209,82L205,82L205,61L200,61Z"/>
+    <!-- E -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M217,82L217,56L229,56L229,61L222,61L222,66L228,66L228,71L222,71L222,77L229,77L229,82Z"/>
+    <!-- L -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M233,82L233,56L238,56L238,77L245,77L245,82Z"/>
+    <!-- E -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M249,82L249,56L261,56L261,61L254,61L254,66L260,66L260,71L254,71L254,77L261,77L261,82Z"/>
+
+    <!-- Badge TV EN VIVO -->
+    <path
+        android:fillColor="#0284c7"
+        android:strokeColor="#38bdf8"
+        android:strokeWidth="1.5"
+        android:pathData="M160,98h105a8,8 0 0 1 8,8v12a8,8 0 0 1 -8,8h-105a8,8 0 0 1 -8,-8v-12a8,8 0 0 1 8,-8z"/>
+
+    <!-- Punto rojo EN VIVO -->
+    <path
+        android:fillColor="#ef4444"
+        android:pathData="M172,112m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
+
+</vector>

@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mi Tele TV</title>
+  
+  <!-- Oculta Referer para evitar bloqueos CORS en CDNs de TV -->
+  <meta name="referrer" content="no-referrer">
+
+  <!-- Hls.js para streaming en vivo IPTV (.m3u8) -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #080c14;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================================
+       VISTA PRINCIPAL: GRILLA DE CANALES (ADAPTADA A 16:9 TV)
+       ========================================================================== */
+    #view-home {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100vh;
+      padding: 20px 40px 16px 40px;
+      width: 100%;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    header.app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-title h1 {
+      font-size: 2.3rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-iptv {
+      background: #0284c7;
+      border: 2px solid #38bdf8;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: 9999px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Píldoras / Pestañas de categorías */
+    .category-pills {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-pill {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-pill:focus, .btn-pill:hover {
+      outline: none;
+      background: #facc15;
+      color: #000;
+      border-color: #ffffff;
+      transform: scale(1.06);
+      box-shadow: 0 0 16px rgba(250, 204, 21, 0.6);
+    }
+
+    .btn-pill.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    .clock-display {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #facc15;
+      font-variant-numeric: tabular-nums;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 6px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(250, 204, 21, 0.3);
+    }
+
+    .btn-config-m3u {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      outline: none;
+    }
+
+    .btn-config-m3u:focus, .btn-config-m3u:hover {
+      outline: none;
+      background: #facc15;
+      color: #000;
+      border-color: #ffffff;
+      transform: scale(1.05);
+      box-shadow: 0 0 16px rgba(250, 204, 21, 0.6);
+    }
+
+    /* Contenedor desplazable de la grilla de canales con TV D-Pad */
+    .grid-scroll-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      margin: 12px 0;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: #38bdf8 rgba(15, 23, 42, 0.6);
+    }
+
+    /* Grilla de canales para TV: 4 columnas en 16:9 con desplazamiento suave */
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      align-content: start;
+      padding: 6px 4px 14px 4px;
+    }
+
+    /* Tarjetas de canales optimizadas para control remoto de TV */
+    .channel-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      padding: 14px 10px;
+      cursor: pointer;
+      text-align: center;
+      border: 4px solid transparent;
+      outline: none;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+      min-height: 145px;
+    }
+
+    /* ESTADO DE FOCO PARA CONTROL REMOTO (D-PAD TV) */
+    .channel-card:focus, .channel-card:focus-visible, .channel-card.tv-focused {
+      outline: none;
+      border-color: #facc15 !important;
+      transform: scale(1.07) translateY(-3px);
+      box-shadow: 0 0 28px rgba(250, 204, 21, 0.9), 0 14px 32px rgba(0, 0, 0, 0.85);
+      filter: brightness(1.22);
+      z-index: 10;
+    }
+
+    .channel-card .channel-number-tag {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #facc15;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 2px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(250, 204, 21, 0.4);
+    }
+
+    .channel-card .source-count-badge {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #38bdf8;
+      font-size: 0.88rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
+    .channel-card .logo-container {
+      width: 72px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+    }
+
+    .channel-card .logo-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .channel-card .channel-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+      line-height: 1.1;
+    }
+
+    .channel-card .channel-subtitle {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.88);
+      margin-top: 3px;
+    }
+
+    /* Colores e identidades visuales para los 18 canales */
+    .card-tn { background: linear-gradient(135deg, #0b2545 0%, #134074 60%, #e65c00 100%); }
+    .card-telefe { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0284c7 100%); }
+    .card-c5n { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 60%, #dc2626 100%); }
+    .card-eltrece { background: linear-gradient(135deg, #2a0845 0%, #540d6e 50%, #f72585 100%); }
+    .card-elnueve { background: linear-gradient(135deg, #831843 0%, #be185d 55%, #f43f5e 100%); }
+    .card-americatv { background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #ea580c 100%); }
+    .card-a24 { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #dc2626 100%); }
+    .card-tvpublica { background: linear-gradient(135deg, #075985 0%, #0284c7 50%, #38bdf8 100%); }
+    .card-lnmas { background: linear-gradient(135deg, #091e3a 0%, #0c4a6e 60%, #0284c7 100%); }
+    .card-cronica { background: linear-gradient(135deg, #991b1b 0%, #dc2626 60%, #facc15 100%); }
+    .card-canalrural { background: linear-gradient(135deg, #14532d 0%, #15803d 60%, #84cc16 100%); }
+    .card-espn { background: linear-gradient(135deg, #18181b 0%, #b91c1c 65%, #dc2626 100%); }
+    .card-espn2 { background: linear-gradient(135deg, #27272a 0%, #991b1b 60%, #ea580c 100%); }
+    .card-foxsports { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #f59e0b 100%); }
+    .card-dsports { background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 60%, #38bdf8 100%); }
+    .card-daznf1 { background: linear-gradient(135deg, #18181b 0%, #3f3f46 60%, #ef4444 100%); }
+    .card-espnpremium { background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #facc15 100%); }
+    .card-tntsports { background: linear-gradient(135deg, #3b0764 0%, #701a75 55%, #f43f5e 100%); }
+
+    /* Barra inferior con ayuda de teclas de control remoto */
+    footer.app-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 18px;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+
+    .remote-hints {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .hint-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .key-badge {
+      background: #1e293b;
+      color: #facc15;
+      border: 1px solid rgba(250, 204, 21, 0.4);
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 900;
+    }
+
+    /* ==========================================================================
+       VISTA DEL REPRODUCTOR A PANTALLA COMPLETA
+       ========================================================================== */
+    #view-player {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000000;
+      z-index: 1000;
+      flex-direction: column;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      overflow: hidden;
+    }
+
+    video#tv-video, iframe#tv-iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      border: none;
+    }
+
+    iframe#tv-iframe {
+      pointer-events: none !important;
+    }
+
+    /* Toast flotante de Zapping rápido */
+    .zapping-toast {
+      position: absolute;
+      top: 36px;
+      right: 44px;
+      display: none;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.95);
+      padding: 14px 28px;
+      border-radius: 20px;
+      border: 3px solid #facc15;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+      z-index: 200;
+      animation: fadeInToast 0.2s ease;
+    }
+
+    @keyframes fadeInToast {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .zapping-toast .toast-num {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #facc15;
+    }
+
+    .zapping-toast .toast-name {
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    /* Cartel de carga / buffer */
+    .loading-spinner {
+      position: absolute;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      color: #ffffff;
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.88);
+      padding: 30px 48px;
+      border-radius: 28px;
+      border: 3px solid rgba(56, 189, 248, 0.4);
+      z-index: 60;
+      text-align: center;
+      max-width: 80%;
+    }
+
+    .spinner {
+      width: 64px;
+      height: 64px;
+      border: 7px solid rgba(255,255,255,0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Aviso de canal sin respuesta */
+    .channel-notice-card {
+      position: absolute;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 36px 48px;
+      max-width: 800px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 3px solid rgba(56, 189, 248, 0.4);
+      border-radius: 32px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.85);
+      z-index: 50;
+    }
+
+    .channel-notice-card h2 {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+      color: #ffffff;
+    }
+
+    .channel-notice-card p {
+      font-size: 1.35rem;
+      color: #cbd5e1;
+      margin-bottom: 26px;
+      line-height: 1.4;
+    }
+
+    /* Capa de controles sobreimpresos (Overlay) */
+    .player-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px 44px;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.88) 0%, transparent 25%, transparent 60%, rgba(0,0,0,0.94) 100%);
+      z-index: 100;
+    }
+
+    .player-overlay.hidden {
+      opacity: 0;
+      pointer-events: none !important;
+    }
+
+    .overlay-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: auto;
+    }
+
+    .btn-tv-control {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 12px 26px;
+      border-radius: 9999px;
+      background: #facc15;
+      color: #000000;
+      border: 4px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      transition: all 0.15s ease;
+      outline: none;
+    }
+
+    .btn-tv-control:focus, .btn-tv-control:focus-visible {
+      transform: scale(1.08);
+      border-color: #ffffff !important;
+      box-shadow: 0 0 28px rgba(250, 204, 21, 0.95);
+      filter: brightness(1.2);
+    }
+
+    .current-channel-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 12px 26px;
+      border-radius: 9999px;
+      border: 2px solid rgba(56, 189, 248, 0.4);
+    }
+
+    .current-channel-name {
+      font-size: 1.85rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    /* Barra inferior de zapping rápido con carrusel horizontal */
+    .overlay-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: auto;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .channel-menu-label {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.92);
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+    }
+
+    .channel-selector-bar {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      overflow-x: auto;
+      padding: 6px 4px;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+    }
+
+    .channel-selector-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .btn-bar-channel {
+      flex: 0 0 auto;
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 1.25rem;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-bar-channel:focus, .btn-bar-channel:focus-visible {
+      transform: scale(1.08) translateY(-4px);
+      border-color: #facc15 !important;
+      box-shadow: 0 0 24px rgba(250, 204, 21, 0.9);
+      filter: brightness(1.25);
+    }
+
+    .btn-bar-channel.active {
+      border: 4px solid #facc15 !important;
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.8);
+      filter: brightness(1.2);
+    }
+
+    /* Modal de configuración de lista M3U */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .modal-box {
+      background: #1e293b;
+      border: 4px solid #38bdf8;
+      border-radius: 28px;
+      padding: 36px;
+      max-width: 760px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+    }
+
+    .modal-box h2 {
+      font-size: 2.2rem;
+      color: #facc15;
+      margin-bottom: 16px;
+    }
+
+    .input-m3u {
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 3px solid #38bdf8;
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 1.25rem;
+      margin-bottom: 22px;
+      outline: none;
+    }
+
+    .input-m3u:focus {
+      border-color: #facc15;
+      box-shadow: 0 0 16px rgba(250, 204, 21, 0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== VISTA PRINCIPAL: GRILLA DE CANALES TV ==================== -->
+  <main id="view-home">
+    <header class="app-header">
+      <div class="brand-title">
+        <h1>
+          📺 Mi Tele TV
+          <span class="badge-iptv">18 CANALES</span>
+        </h1>
+      </div>
+
+      <!-- Filtro de Categorías con Control Remoto -->
+      <div class="category-pills">
+        <button class="btn-pill active" id="pill-all" data-category="all" tabindex="0">⭐ Todos (18)</button>
+        <button class="btn-pill" id="pill-news" data-category="aire" tabindex="0">📺 Aire y Noticias (11)</button>
+        <button class="btn-pill" id="pill-sports" data-category="deportes" tabindex="0">⚽ Deportes y F1 (7)</button>
+      </div>
+
+      <div class="header-right">
+        <span class="clock-display" id="tv-clock">12:00</span>
+        <button class="btn-config-m3u" id="btn-open-m3u-config" tabindex="0">⚙️ Lista M3U</button>
+      </div>
+    </header>
+
+    <div class="grid-scroll-wrapper" id="grid-scroll-wrapper">
+      <section class="channels-grid" id="channels-container">
+        <!-- Generado dinámicamente con tabindex="0" para navegación con control remoto -->
+      </section>
+    </div>
+
+    <footer class="app-footer">
+      <div class="remote-hints">
+        <div class="hint-item"><span class="key-badge">◄ ▲ ▼ ►</span> Navegar</div>
+        <div class="hint-item"><span class="key-badge">OK</span> Sintonizar</div>
+        <div class="hint-item"><span class="key-badge">ATRÁS</span> Salir / Grilla</div>
+        <div class="hint-item"><span class="key-badge">1 - 18</span> Número directo</div>
+      </div>
+      <div id="m3u-status-text" style="color: #38bdf8; font-weight: 800;">🔄 Sincronizando IPTV...</div>
+    </footer>
+  </main>
+
+  <!-- Modal para configurar lista .M3U personalizada adicional -->
+  <div class="modal-backdrop" id="m3u-config-modal">
+    <div class="modal-box">
+      <h2>📡 Configurar Lista IPTV (.m3u / .m3u8)</h2>
+      <p style="font-size: 1.25rem; color: #cbd5e1; margin-bottom: 20px; line-height: 1.4;">
+        Mi Tele TV ya incluye servidores verificados de Argentina y deportes. Si tenés una lista propia con Pack Fútbol o señales de tu proveedor, pegala acá:
+      </p>
+      <input type="url" id="input-custom-m3u" class="input-m3u" placeholder="https://ejemplo.com/lista_deportes.m3u" />
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn-tv-control" id="btn-save-m3u" tabindex="0">💾 Guardar</button>
+        <button class="btn-tv-control" id="btn-close-m3u" style="background: #475569; color: #fff;" tabindex="0">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VISTA DE REPRODUCTOR IPTV PANTALLA COMPLETA ==================== -->
+  <section id="view-player">
+    <div class="video-container" id="video-wrapper">
+      
+      <!-- Video HLS Nativo -->
+      <video id="tv-video" playsinline webkit-playsinline></video>
+
+      <!-- Iframe para reproductores IPTV de emisora (si aplica) -->
+      <iframe id="tv-iframe" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen playsinline style="display: none;"></iframe>
+
+      <!-- Toast flotante de Zapping rápido -->
+      <div class="zapping-toast" id="zapping-toast">
+        <span class="toast-num" id="toast-num">1</span>
+        <span class="toast-name" id="toast-name">TN</span>
+      </div>
+
+      <!-- Cartel de carga / conectando -->
+      <div class="loading-spinner" id="player-loading">
+        <div class="spinner"></div>
+        <span id="loading-text">Conectando señal...</span>
+      </div>
+
+      <!-- Tarjeta de aviso si fallaron todas las señales de este canal -->
+      <div class="channel-notice-card" id="channel-notice">
+        <h2 id="notice-title">Señal no disponible</h2>
+        <p id="notice-desc">Se probaron todos los servidores IPTV de esta emisora.</p>
+        <div style="display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;">
+          <button class="btn-tv-control" id="btn-notice-retry" tabindex="0">
+            🔄 Reintentar servidores
+          </button>
+          <button class="btn-tv-control" id="btn-notice-back" style="background: #475569; color: #fff;" tabindex="0">
+            ⬅ Volver a canales
+          </button>
+        </div>
+      </div>
+
+      <!-- Capa de controles sobreimpresos (Auto-oculta) -->
+      <div class="player-overlay" id="player-overlay">
+        <div class="overlay-top">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <button class="btn-tv-control" id="btn-back" tabindex="0">
+              ⬅ VOLVER
+            </button>
+            <button class="btn-tv-control" id="btn-switch-source" style="background: #0284c7; color: #ffffff;" tabindex="0">
+              📡 CAMBIAR SEÑAL IP (1/1)
+            </button>
+          </div>
+          
+          <div class="current-channel-info">
+            <span class="badge-iptv" id="source-type-badge">HLS IP</span>
+            <span class="current-channel-name" id="player-channel-name">Canal</span>
+          </div>
+        </div>
+
+        <!-- Parte Inferior: Menú de zapping directo con los 18 canales -->
+        <div class="overlay-bottom">
+          <span class="channel-menu-label">Presione Izquierda / Derecha para cambiar de canal:</span>
+          <div class="channel-selector-bar" id="channel-selector-bar">
+            <!-- 18 botones generados automáticamente con tabindex="0" -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* ==========================================================================
+       1. RELOJ EN PANTALLA PRINCIPAL
+       ========================================================================== */
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const clockEl = document.getElementById("tv-clock");
+      if (clockEl) clockEl.textContent = `${hours}:${minutes}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ==========================================================================
+       2. CONFIGURACIÓN DEL PROXY CORS / IP (CLOUDFLARE WORKER)
+       ========================================================================== */
+    const CLOUDFLARE_WORKER_URL = "https://mi-tele-proxy.andresehansen.workers.dev";
+
+    function normalizeIpUrlForWorker(rawUrl) {
+      try {
+        const u = new URL(rawUrl);
+        if (/^\d{1,3}(\.\d{1,3}){3}$/.test(u.hostname)) {
+          u.hostname = `${u.hostname}.sslip.io`;
+          return u.toString();
+        }
+      } catch (e) {}
+      return rawUrl;
+    }
+
+    function getProxiedUrl(targetUrl) {
+      if (!CLOUDFLARE_WORKER_URL || !targetUrl) return targetUrl;
+      const normalized = normalizeIpUrlForWorker(targetUrl);
+      const base = CLOUDFLARE_WORKER_URL.endsWith("/")
+        ? CLOUDFLARE_WORKER_URL.slice(0, -1)
+        : CLOUDFLARE_WORKER_URL;
+      return `${base}/?url=${encodeURIComponent(normalized)}`;
+    }
+
+    /* ==========================================================================
+       3. LISTAS PÚBLICAS M3U DE ARGENTINA Y DEPORTES (AUTO-ESCANEO EN TIEMPO REAL)
+       ========================================================================== */
+    const PUBLIC_M3U_LISTS = [
+      "https://iptv-org.github.io/iptv/countries/ar.m3u",
+      "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ar.m3u",
+      "https://iptv-org.github.io/iptv/categories/sports.m3u",
+      "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_argentina.m3u8",
+      "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_sports.m3u8",
+      "https://raw.githubusercontent.com/sesteva/m3u/master/argentina.txt"
+    ];
+
+    /* ==========================================================================
+       4. DEFINICIÓN COMPLETA DE LOS 18 CANALES
+       ========================================================================== */
+    const CHANNELS = [
+      // --- AIRE Y NOTICIAS ---
+      {
+        id: "tn",
+        number: 1,
+        category: "aire",
+        name: "TN",
+        subtitle: "Todo Noticias",
+        themeClass: "card-tn",
+        m3uKeywords: ["todonoticias.ar", "todo noticias", "tn hd", ",tn"],
+        baseCandidates: [
+          { label: "Artear Directo 1080p #1", kind: "hls", url: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8", proxy: false },
+          { label: "Artear Directo 1080p #2", kind: "hls", url: "https://live-01-02-tn.vodgc.net/TN_DAI_Beta/index.m3u8", proxy: false },
+          { label: "API Genoa Artear", kind: "genoa-api", apiUrl: "https://genoa-player-api.vodgc.net/content/1363280" },
+          { label: "Artear vía Proxy IP", kind: "hls", url: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#0b2545"/>
+            <path d="M15 15 L85 15 L60 85 L15 85 Z" fill="#e65c00" opacity="0.35"/>
+            <text x="50" y="65" font-family="sans-serif" font-weight="900" font-size="44" fill="#ffffff" text-anchor="middle">TN</text>
+          </svg>
+        `
+      },
+      {
+        id: "telefe",
+        number: 2,
+        category: "aire",
+        name: "Telefe",
+        subtitle: "Canal 11",
+        themeClass: "card-telefe",
+        m3uKeywords: ["telefe.ar", "telefe hd", "telefe,", ",telefe"],
+        baseCandidates: [
+          {
+            label: "Mediastream Token Oficial",
+            kind: "telefe-token",
+            tokenApiUrl: "https://57j4mtvcjjf7siqnnvkixb5d3i0uvjei.lambda-url.us-east-1.on.aws/?stream_id=6a024684fd4ca6a938f3a118",
+            streamId: "6a024684fd4ca6a938f3a118"
+          },
+          { label: "Pluto TV FAST Directo", kind: "hls", url: "https://siloh-mcdn.plutotv.net/lilo/production/LATAM/Telefe/master.m3u8", proxy: false },
+          { label: "Telefe API Origen", kind: "hls", url: "https://telefe.com/Api/Videos/GetSourceUrl/694564/0/HLS?.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <circle cx="28" cy="50" r="18" fill="#2563eb" />
+            <circle cx="50" cy="50" r="18" fill="#16a34a" />
+            <circle cx="72" cy="50" r="18" fill="#dc2626" />
+            <text x="50" y="86" font-family="sans-serif" font-weight="800" font-size="16" fill="#ffffff" text-anchor="middle">telefe</text>
+          </svg>
+        `
+      },
+      {
+        id: "c5n",
+        number: 3,
+        category: "aire",
+        name: "C5N",
+        subtitle: "Noticias 24hs",
+        themeClass: "card-c5n",
+        m3uKeywords: ["c5n.ar", "c5n hd", ",c5n", "canal 5 noticias"],
+        baseCandidates: [
+          { label: "Extractor Web Oficial C5N", kind: "web-m3u8-scraper", pageUrl: "https://www.c5n.com/" },
+          { label: "KirCDN HLS Directo", kind: "hls", url: "https://live-c5n.kircdn.com/live-c5n/smil:c5n.smil/playlist.m3u8", proxy: false },
+          { label: "KirCDN vía Proxy IP", kind: "hls", url: "https://live-c5n.kircdn.com/live-c5n/smil:c5n.smil/playlist.m3u8", proxy: true },
+          { label: "VodGC C5N HLS", kind: "hls", url: "https://c5n-live.vodgc.net/c5n/live/playlist.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#991b1b"/>
+            <text x="50" y="66" font-family="sans-serif" font-weight="900" font-size="36" fill="#ffffff" text-anchor="middle">C5N</text>
+          </svg>
+        `
+      },
+      {
+        id: "eltrece",
+        number: 4,
+        category: "aire",
+        name: "El Trece",
+        subtitle: "Canal 13",
+        themeClass: "card-eltrece",
+        m3uKeywords: ["eltrece.ar", "el trece", "canal 13", "eltrecetv"],
+        baseCandidates: [
+          { label: "VodGC Directo 1080p #1", kind: "hls", url: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8", proxy: false },
+          { label: "VodGC Directo 1080p #2", kind: "hls", url: "https://live-01-01-eltrece.vodgc.net/eltrecetv/index.m3u8", proxy: false },
+          { label: "VodGC Directo 1080p #3", kind: "hls", url: "https://live-01-02-eltrece.vodgc.net/eltrecetv/index.m3u8", proxy: false },
+          { label: "VodGC vía Proxy IP", kind: "hls", url: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="#581c87"/>
+            <circle cx="50" cy="50" r="28" fill="#ea580c"/>
+            <circle cx="50" cy="50" r="15" fill="#facc15"/>
+            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="13" fill="#ffffff" text-anchor="middle">el trece</text>
+          </svg>
+        `
+      },
+      {
+        id: "elnueve",
+        number: 5,
+        category: "aire",
+        name: "El Nueve",
+        subtitle: "Canal 9",
+        themeClass: "card-elnueve",
+        m3uKeywords: ["elnueve.ar", "el nueve", "canal 9", "canal9", "telearte"],
+        baseCandidates: [
+          { label: "Extractor Web El Nueve", kind: "web-m3u8-scraper", pageUrl: "https://www.elnueve.com.ar/en-vivo" },
+          { label: "Servidor IP 45.226.28.9 (Proxy)", kind: "hls", url: "http://45.226.28.9:8085/Live/18e292ea93b66c65c76707f07c489d61/local-canal9.playlist.m3u8", proxy: true },
+          { label: "Servidor IP 45.226.28.9 (Directo)", kind: "hls", url: "http://45.226.28.9:8085/Live/18e292ea93b66c65c76707f07c489d61/local-canal9.playlist.m3u8", proxy: false }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#9d174d"/>
+            <circle cx="50" cy="44" r="28" fill="#f43f5e"/>
+            <text x="50" y="59" font-family="sans-serif" font-weight="900" font-size="44" fill="#ffffff" text-anchor="middle">9</text>
+            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">EL NUEVE</text>
+          </svg>
+        `
+      },
+      {
+        id: "americatv",
+        number: 6,
+        category: "aire",
+        name: "América TV",
+        subtitle: "Canal 2",
+        themeClass: "card-americatv",
+        m3uKeywords: ["americatv.ar", "america tv", "américa tv", "america hd", ",america", "canal 2 la plata"],
+        baseCandidates: [
+          { label: "Qaotic Edge 720p Directo", kind: "hls", url: "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8", proxy: false },
+          { label: "Qaotic vía Proxy IP", kind: "hls", url: "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8", proxy: true },
+          { label: "VodGC Directo", kind: "hls", url: "https://live-01-01-americatv.vodgc.net/americatv/index.m3u8", proxy: false },
+          { label: "Extractor Web América", kind: "web-m3u8-scraper", pageUrl: "https://www.americatv.com.ar/" }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#0284c7"/>
+            <polygon points="50,18 82,80 18,80" fill="#ea580c"/>
+            <circle cx="50" cy="54" r="16" fill="#facc15"/>
+            <text x="50" y="93" font-family="sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">AMÉRICA</text>
+          </svg>
+        `
+      },
+      {
+        id: "a24",
+        number: 7,
+        category: "aire",
+        name: "A24",
+        subtitle: "América 24",
+        themeClass: "card-a24",
+        m3uKeywords: ["a24.ar", "a24", "america 24", "américa 24", "a24 hd"],
+        baseCandidates: [
+          { label: "VodGC A24 Directo #1", kind: "hls", url: "https://live-01-02-a24.vodgc.net/a24/index.m3u8", proxy: false },
+          { label: "VodGC A24 Directo #2", kind: "hls", url: "https://live-01-01-a24.vodgc.net/a24/index.m3u8", proxy: false },
+          { label: "VodGC A24 vía Proxy IP", kind: "hls", url: "https://live-01-02-a24.vodgc.net/a24/index.m3u8", proxy: true },
+          { label: "Extractor Web A24", kind: "web-m3u8-scraper", pageUrl: "https://www.a24.com/en-vivo" }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#1e3a8a"/>
+            <path d="M15 80 L35 24 L52 24 L70 80 L52 80 L47 62 L32 62 L27 80 Z" fill="#dc2626"/>
+            <text x="73" y="74" font-family="sans-serif" font-weight="900" font-size="34" fill="#ffffff" text-anchor="middle">24</text>
+          </svg>
+        `
+      },
+      {
+        id: "tvpublica",
+        number: 8,
+        category: "aire",
+        name: "TV Pública",
+        subtitle: "Canal 7",
+        themeClass: "card-tvpublica",
+        m3uKeywords: ["tvpublica.ar", "tv publica", "tv pública", "televisión pública", "television publica", "canal 7"],
+        baseCandidates: [
+          { label: "Extractor Edge-Apps RTA", kind: "web-m3u8-scraper", pageUrl: "https://vmf.edge-apps.net/embed/live.php?streamname=c7live01-20034&autoplay=true" },
+          { label: "Reproductor IP RTA Oficial", kind: "iptv-iframe", embedUrl: "https://vmf.edge-apps.net/embed/live.php?streamname=c7live01-20034&autoplay=true" },
+          { label: "Edge-Access HLS Directo", kind: "hls", url: "https://g5.vxral-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8", proxy: false },
+          { label: "Edge-Access vía Proxy IP", kind: "hls", url: "https://g5.vxral-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#0369a1"/>
+            <rect x="0" y="35" width="100" height="30" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="11" fill="#f59e0b"/>
+            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">TV PÚBLICA</text>
+          </svg>
+        `
+      },
+      {
+        id: "lnmas",
+        number: 9,
+        category: "aire",
+        name: "LN+",
+        subtitle: "La Nación +",
+        themeClass: "card-lnmas",
+        m3uKeywords: ["lanacionplus.ar", "lnmas.ar", "ln+", "la nacion +", "la nación +", "lanacion+"],
+        baseCandidates: [
+          { label: "Puente HLS LN+ Oficial", kind: "hls", url: "https://ythls.armelin.one/channel/UCba3hpU7EFBSk817y9qZkiA.m3u8", proxy: false },
+          { label: "Puente HLS vía Proxy IP", kind: "hls", url: "https://ythls.armelin.one/channel/UCba3hpU7EFBSk817y9qZkiA.m3u8", proxy: true },
+          { label: "Extractor Web LN+", kind: "web-m3u8-scraper", pageUrl: "https://www.lanacion.com.ar/lnmas/" }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#091e3a"/>
+            <text x="36" y="66" font-family="sans-serif" font-weight="900" font-size="42" fill="#ffffff" text-anchor="middle">LN</text>
+            <text x="76" y="66" font-family="sans-serif" font-weight="900" font-size="48" fill="#38bdf8" text-anchor="middle">+</text>
+          </svg>
+        `
+      },
+      {
+        id: "cronica",
+        number: 10,
+        category: "aire",
+        name: "Crónica",
+        subtitle: "Firme junto al pueblo",
+        themeClass: "card-cronica",
+        m3uKeywords: ["cronicatv.ar", "cronica.ar", "cronica tv", "crónica tv", "cronicatv", ",cronica"],
+        baseCandidates: [
+          { label: "Puente HLS Crónica Oficial", kind: "hls", url: "https://ythls.armelin.one/channel/UCswUoGf7k6wJ5yvM6vQ3-5g.m3u8", proxy: false },
+          { label: "Puente HLS vía Proxy IP", kind: "hls", url: "https://ythls.armelin.one/channel/UCswUoGf7k6wJ5yvM6vQ3-5g.m3u8", proxy: true },
+          { label: "Extractor Web Crónica", kind: "web-m3u8-scraper", pageUrl: "https://www.cronicatv.com.ar/" }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#dc2626"/>
+            <rect x="8" y="24" width="84" height="42" rx="10" fill="#ffffff"/>
+            <text x="50" y="55" font-family="sans-serif" font-weight="900" font-size="18" fill="#dc2626" text-anchor="middle">CRONICA</text>
+            <text x="50" y="86" font-family="sans-serif" font-weight="800" font-size="13" fill="#facc15" text-anchor="middle">EN VIVO</text>
+          </svg>
+        `
+      },
+      {
+        id: "canalrural",
+        number: 11,
+        category: "aire",
+        name: "Canal Rural",
+        subtitle: "El campo en vivo",
+        themeClass: "card-canalrural",
+        m3uKeywords: ["canalrural.ar", "canal rural", "el rural", "elrural"],
+        baseCandidates: [
+          { label: "Alsolnet HLS Directo", kind: "hls", url: "https://cda2.alsolnet.com/elrural/live/playlist.m3u8", proxy: false },
+          { label: "Alsolnet vía Proxy IP", kind: "hls", url: "https://cda2.alsolnet.com/elrural/live/playlist.m3u8", proxy: true },
+          { label: "Extractor Web El Rural", kind: "web-m3u8-scraper", pageUrl: "https://www.elrural.com/transmision-en-vivo/" }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#14532d"/>
+            <path d="M50 20 C65 35 65 65 50 80 C35 65 35 35 50 20 Z" fill="#84cc16"/>
+            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">RURAL</text>
+          </svg>
+        `
+      },
+
+      // --- DEPORTES Y F1 ---
+      {
+        id: "espn",
+        number: 12,
+        category: "deportes",
+        name: "ESPN",
+        subtitle: "El líder mundial",
+        themeClass: "card-espn",
+        m3uKeywords: ["espn.ar", "espn sur", "espn argentina", "espn 1", "espn hd", ",espn"],
+        baseCandidates: [
+          { label: "Servidor Deportes Directo #1", kind: "hls", url: "https://tvsen7.aynascope.net/espn/index.m3u8", proxy: false },
+          { label: "Servidor Deportes vía Proxy IP", kind: "hls", url: "https://tvsen7.aynascope.net/espn/index.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#18181b"/>
+            <text x="50" y="62" font-family="sans-serif" font-weight="900" font-size="30" font-style="italic" fill="#dc2626" text-anchor="middle">ESPN</text>
+            <line x1="12" y1="44" x2="88" y2="44" stroke="#ffffff" stroke-width="2.5"/>
+          </svg>
+        `
+      },
+      {
+        id: "espn2",
+        number: 13,
+        category: "deportes",
+        name: "ESPN 2",
+        subtitle: "Deportes internacionales",
+        themeClass: "card-espn2",
+        m3uKeywords: ["espn2.ar", "espn 2", "espn 2 sur", "espn 2 argentina", "espn2"],
+        baseCandidates: [
+          { label: "Servidor Deportes 2 Directo", kind: "hls", url: "https://tvsen7.aynascope.net/espn2/index.m3u8", proxy: false },
+          { label: "Servidor Deportes 2 vía Proxy IP", kind: "hls", url: "https://tvsen7.aynascope.net/espn2/index.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#27272a"/>
+            <text x="42" y="62" font-family="sans-serif" font-weight="900" font-size="26" font-style="italic" fill="#dc2626" text-anchor="middle">ESPN</text>
+            <text x="80" y="62" font-family="sans-serif" font-weight="900" font-size="34" fill="#facc15" text-anchor="middle">2</text>
+            <line x1="10" y1="45" x2="72" y2="45" stroke="#ffffff" stroke-width="2"/>
+          </svg>
+        `
+      },
+      {
+        id: "foxsports",
+        number: 14,
+        category: "deportes",
+        name: "Fox Sports",
+        subtitle: "Deportes en vivo",
+        themeClass: "card-foxsports",
+        m3uKeywords: ["foxsports.ar", "fox sports", "fox sports 1", "fox sports argentina", "foxsports"],
+        baseCandidates: [
+          { label: "Servidor Fox Directo", kind: "hls", url: "https://tvsen7.aynascope.net/foxsports2/index.m3u8", proxy: false },
+          { label: "Servidor Fox vía Proxy IP", kind: "hls", url: "https://tvsen7.aynascope.net/foxsports2/index.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#1e3a8a"/>
+            <circle cx="50" cy="50" r="38" fill="#1d4ed8" stroke="#f59e0b" stroke-width="3"/>
+            <text x="50" y="58" font-family="sans-serif" font-weight="900" font-size="24" fill="#ffffff" text-anchor="middle">FOX</text>
+            <text x="50" y="74" font-family="sans-serif" font-weight="800" font-size="10" fill="#facc15" text-anchor="middle">SPORTS</text>
+          </svg>
+        `
+      },
+      {
+        id: "dsports",
+        number: 15,
+        category: "deportes",
+        name: "DSports",
+        subtitle: "DirecTV Sports",
+        themeClass: "card-dsports",
+        m3uKeywords: ["dsports", "directv sports", "dsports 1", "dsports hd", "dsports argentina"],
+        baseCandidates: [
+          { label: "Servidor DSports Directo", kind: "hls", url: "https://barinaslive1.boldmss.com/DIRECTV/DIRECTV.isml/DIRECTV.m3u8", proxy: false },
+          { label: "Servidor DSports vía Proxy IP", kind: "hls", url: "https://barinaslive1.boldmss.com/DIRECTV/DIRECTV.isml/DIRECTV.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#0c4a6e"/>
+            <path d="M26 24 L56 24 C72 24 82 34 82 50 C82 66 72 76 56 76 L26 76 Z" fill="#0284c7"/>
+            <path d="M42 38 L54 38 C62 38 66 42 66 50 C66 58 62 62 54 62 L42 62 Z" fill="#0c4a6e"/>
+            <text x="50" y="90" font-family="sans-serif" font-weight="900" font-size="11" fill="#38bdf8" text-anchor="middle">SPORTS</text>
+          </svg>
+        `
+      },
+      {
+        id: "daznf1",
+        number: 16,
+        category: "deportes",
+        name: "DAZN F1",
+        subtitle: "Fórmula 1 en vivo",
+        themeClass: "card-daznf1",
+        m3uKeywords: ["dazn f1", "f1 tv", "formula 1", "f1 hd", "daznf1"],
+        baseCandidates: [
+          { label: "Servidor F1 Directo", kind: "hls", url: "https://tvsen7.aynascope.net/daznf1/index.m3u8", proxy: false },
+          { label: "Servidor F1 vía Proxy IP", kind: "hls", url: "https://tvsen7.aynascope.net/daznf1/index.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#18181b"/>
+            <text x="50" y="44" font-family="sans-serif" font-weight="900" font-size="18" fill="#ffffff" text-anchor="middle">DAZN</text>
+            <text x="50" y="78" font-family="sans-serif" font-weight="900" font-size="36" font-style="italic" fill="#ef4444" text-anchor="middle">F1</text>
+          </svg>
+        `
+      },
+      {
+        id: "espnpremium",
+        number: 17,
+        category: "deportes",
+        name: "ESPN Premium",
+        subtitle: "Fútbol Argentino",
+        themeClass: "card-espnpremium",
+        m3uKeywords: ["espn premium", "espnpremium", "pack futbol espn", "espn premium hd"],
+        baseCandidates: [
+          { label: "Servidor Premium Directo", kind: "hls", url: "https://smjt9q.envivoslatam.org/espnpremium/mono.m3u8", proxy: false },
+          { label: "Servidor Premium vía Proxy IP", kind: "hls", url: "https://smjt9q.envivoslatam.org/espnpremium/mono.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#064e3b"/>
+            <text x="50" y="46" font-family="sans-serif" font-weight="900" font-size="22" font-style="italic" fill="#dc2626" text-anchor="middle">ESPN</text>
+            <rect x="14" y="56" width="72" height="24" rx="6" fill="#facc15"/>
+            <text x="50" y="73" font-family="sans-serif" font-weight="900" font-size="11" fill="#000000" text-anchor="middle">PREMIUM</text>
+          </svg>
+        `
+      },
+      {
+        id: "tntsports",
+        number: 18,
+        category: "deportes",
+        name: "TNT Sports",
+        subtitle: "Pasión Nacional",
+        themeClass: "card-tntsports",
+        m3uKeywords: ["tnt sports", "tntsports", "pack futbol tnt", "tnt sports argentina", "tnt sports hd"],
+        baseCandidates: [
+          { label: "Servidor TNT Directo", kind: "hls", url: "https://smjt9q.envivoslatam.org/tntsports/tracks-v1a1/mono.m3u8", proxy: false },
+          { label: "Servidor TNT vía Proxy IP", kind: "hls", url: "https://smjt9q.envivoslatam.org/tntsports/tracks-v1a1/mono.m3u8", proxy: true }
+        ],
+        discoveredUrls: [],
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#3b0764"/>
+            <circle cx="50" cy="42" r="26" fill="#f43f5e"/>
+            <text x="50" y="50" font-family="sans-serif" font-weight="900" font-size="18" fill="#ffffff" text-anchor="middle">TNT</text>
+            <text x="50" y="84" font-family="sans-serif" font-weight="900" font-size="13" fill="#facc15" text-anchor="middle">SPORTS</text>
+          </svg>
+        `
+      }
+    ];
+
+    function getChannelCandidates(channel) {
+      const m3uCandidates = [];
+      channel.discoveredUrls.forEach((url, i) => {
+        const isHttpIp = url.startsWith("http://");
+        if (!isHttpIp) {
+          m3uCandidates.push({ label: `Lista M3U #${i + 1} (Directo)`, kind: "hls", url: url, proxy: false });
+        }
+        m3uCandidates.push({ label: `Lista M3U #${i + 1} (Proxy IP)`, kind: "hls", url: url, proxy: true });
+      });
+      if (channel.id === "tn" || channel.id === "telefe" || channel.id === "eltrece" || channel.id === "americatv" || channel.id === "a24") {
+        return [...channel.baseCandidates, ...m3uCandidates];
+      }
+      return [...m3uCandidates, ...channel.baseCandidates];
+    }
+
+    /* ==========================================================================
+       5. ESCÁNER AUTOMÁTICO DE LISTAS M3U (ARGENTINA + DEPORTES)
+       ========================================================================== */
+    const m3uStatusText = document.getElementById("m3u-status-text");
+
+    function parseAndAssignM3u(m3uContent) {
+      const lines = m3uContent.split(/\r?\n/);
+      let currentInfo = "";
+      let addedCount = 0;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        if (line.startsWith("#EXTINF")) {
+          currentInfo = line.toLowerCase();
+        } else if (!line.startsWith("#") && (line.startsWith("http://") || line.startsWith("https://"))) {
+          if (line.includes("youtube.com") || line.includes("youtu.be")) {
+            currentInfo = "";
+            continue;
+          }
+          const combinedSearch = `${currentInfo} ${line.toLowerCase()}`;
+          CHANNELS.forEach((ch) => {
+            const matched = ch.m3uKeywords.some((kw) => combinedSearch.includes(kw));
+            if (matched && !ch.discoveredUrls.includes(line)) {
+              const alreadyInBase = ch.baseCandidates.some((b) => b.url === line);
+              if (!alreadyInBase) {
+                ch.discoveredUrls.push(line);
+                addedCount++;
+              }
+            }
+          });
+          currentInfo = "";
+        }
+      }
+      return addedCount;
+    }
+
+    async function harvestAllM3uLists() {
+      m3uStatusText.textContent = "🔄 Sintonizando 18 canales...";
+      const customUrl = localStorage.getItem("mi_tele_custom_m3u");
+      const listsToFetch = customUrl ? [customUrl, ...PUBLIC_M3U_LISTS] : [...PUBLIC_M3U_LISTS];
+
+      let totalNew = 0;
+      await Promise.allSettled(
+        listsToFetch.map(async (listUrl) => {
+          try {
+            let resp = await fetch(listUrl);
+            if (!resp.ok && CLOUDFLARE_WORKER_URL) {
+              resp = await fetch(getProxiedUrl(listUrl));
+            }
+            if (resp && resp.ok) {
+              const text = await resp.text();
+              totalNew += parseAndAssignM3u(text);
+            }
+          } catch (e) {
+            try {
+              if (CLOUDFLARE_WORKER_URL) {
+                const resp2 = await fetch(getProxiedUrl(listUrl));
+                if (resp2.ok) {
+                  const text2 = await resp2.text();
+                  totalNew += parseAndAssignM3u(text2);
+                }
+              }
+            } catch (err2) {}
+          }
+        })
+      );
+
+      updateSourceBadgesOnCards();
+      const totalSources = CHANNELS.reduce((acc, ch) => acc + getChannelCandidates(ch).length, 0);
+      m3uStatusText.textContent = `🟢 IPTV Activo (${totalSources} fuentes para 18 canales)`;
+    }
+
+    /* ==========================================================================
+       6. CONSTRUCCIÓN DE LA GRILLA Y PESTAÑAS CON FOCO D-PAD
+       ========================================================================== */
+    const container = document.getElementById("channels-container");
+    const channelCardsElements = [];
+    let currentCategoryFilter = "all";
+
+    function renderChannelsGrid() {
+      container.innerHTML = "";
+      channelCardsElements.length = 0;
+
+      CHANNELS.forEach((channel, index) => {
+        if (currentCategoryFilter !== "all" && channel.category !== currentCategoryFilter) {
+          return;
+        }
+
+        const card = document.createElement("div");
+        card.className = `channel-card ${channel.themeClass}`;
+        card.id = `card-channel-${index}`;
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+        card.setAttribute("aria-label", `Canal ${channel.number} ${channel.name} ${channel.subtitle}`);
+
+        card.innerHTML = `
+          <span class="channel-number-tag">${channel.number}</span>
+          <span class="source-count-badge" id="badge-count-${channel.id}">${getChannelCandidates(channel).length} IP</span>
+          <div class="logo-container">${channel.logoSvg}</div>
+          <div class="channel-title">${channel.name}</div>
+          <div class="channel-subtitle">${channel.subtitle}</div>
+        `;
+
+        card.addEventListener("click", () => openChannel(index));
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " " || e.keyCode === 13) {
+            e.preventDefault();
+            openChannel(index);
+          }
+        });
+
+        // Al recibir foco con el control remoto, asegurar que sea visible con scroll
+        card.addEventListener("focus", () => {
+          card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        });
+
+        container.appendChild(card);
+        channelCardsElements.push(card);
+      });
+    }
+
+    // Configurar píldoras de categorías
+    const pillButtons = document.querySelectorAll(".btn-pill");
+    pillButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        pillButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategoryFilter = btn.dataset.category;
+        renderChannelsGrid();
+        if (channelCardsElements.length > 0) {
+          channelCardsElements[0].focus();
+        }
+      });
+    });
+
+    function updateSourceBadgesOnCards() {
+      CHANNELS.forEach((ch) => {
+        const badge = document.getElementById(`badge-count-${ch.id}`);
+        if (badge) badge.textContent = `${getChannelCandidates(ch).length} IP`;
+      });
+    }
+
+    // Barra de zapping rápida en el reproductor (18 canales horizontales)
+    const channelBar = document.getElementById("channel-selector-bar");
+    CHANNELS.forEach((channel, index) => {
+      const btn = document.createElement("button");
+      btn.className = `btn-bar-channel ${channel.themeClass}`;
+      btn.id = `btn-bar-${channel.id}`;
+      btn.tabIndex = 0;
+      btn.textContent = `${channel.number}. ${channel.name}`;
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openChannel(index);
+        resetOverlayTimer();
+      });
+
+      btn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.keyCode === 13) {
+          e.stopPropagation();
+          openChannel(index);
+          resetOverlayTimer();
+        }
+      });
+
+      channelBar.appendChild(btn);
+    });
+
+    /* ==========================================================================
+       7. REPRODUCTOR IPTV Y ZAPPING
+       ========================================================================== */
+    let currentIndex = 0;
+    let currentCandidateIdx = 0;
+    let currentCandidates = [];
+    let hlsInstance = null;
+    let overlayTimeout = null;
+    let watchdogTimer = null;
+    let toastTimeout = null;
+    let playSessionId = 0;
+
+    const viewHome = document.getElementById("view-home");
+    const viewPlayer = document.getElementById("view-player");
+    const video = document.getElementById("tv-video");
+    const iframe = document.getElementById("tv-iframe");
+    const playerLoading = document.getElementById("player-loading");
+    const loadingText = document.getElementById("loading-text");
+    const channelNotice = document.getElementById("channel-notice");
+    const noticeTitle = document.getElementById("notice-title");
+    const noticeDesc = document.getElementById("notice-desc");
+    const btnNoticeRetry = document.getElementById("btn-notice-retry");
+    const btnNoticeBack = document.getElementById("btn-notice-back");
+    const playerOverlay = document.getElementById("player-overlay");
+    const playerChannelName = document.getElementById("player-channel-name");
+    const btnBack = document.getElementById("btn-back");
+    const btnSwitchSource = document.getElementById("btn-switch-source");
+    const sourceTypeBadge = document.getElementById("source-type-badge");
+    const zappingToast = document.getElementById("zapping-toast");
+    const toastNum = document.getElementById("toast-num");
+    const toastName = document.getElementById("toast-name");
+
+    function showLoading(text) {
+      loadingText.textContent = text;
+      playerLoading.style.display = "flex";
+      channelNotice.style.display = "none";
+    }
+
+    function hideLoading() {
+      playerLoading.style.display = "none";
+    }
+
+    function showZappingToast(ch) {
+      toastNum.textContent = ch.number;
+      toastName.textContent = ch.name;
+      zappingToast.style.display = "flex";
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        zappingToast.style.display = "none";
+      }, 3000);
+    }
+
+    function resetOverlayTimer() {
+      playerOverlay.classList.remove("hidden");
+      clearTimeout(overlayTimeout);
+      overlayTimeout = setTimeout(() => {
+        playerOverlay.classList.add("hidden");
+      }, 5500);
+    }
+
+    function toggleOverlay() {
+      if (playerOverlay.classList.contains("hidden")) {
+        resetOverlayTimer();
+        btnBack.focus();
+      } else {
+        playerOverlay.classList.add("hidden");
+      }
+    }
+
+    document.getElementById("video-wrapper").addEventListener("click", toggleOverlay);
+
+    function updateActiveButtonInBar() {
+      CHANNELS.forEach((ch, idx) => {
+        const btn = document.getElementById(`btn-bar-${ch.id}`);
+        if (btn) {
+          const isActive = idx === currentIndex;
+          btn.classList.toggle("active", isActive);
+          if (isActive) {
+            btn.scrollIntoView({ inline: "center", behavior: "smooth" });
+          }
+        }
+      });
+    }
+
+    function stopCurrentMedia() {
+      clearTimeout(watchdogTimer);
+      if (hlsInstance) {
+        hlsInstance.destroy();
+        hlsInstance = null;
+      }
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      video.style.display = "none";
+
+      iframe.src = "";
+      iframe.style.display = "none";
+    }
+
+    function openChannel(index) {
+      currentIndex = index;
+      const channel = CHANNELS[currentIndex];
+      currentCandidates = getChannelCandidates(channel);
+      currentCandidateIdx = 0;
+
+      viewHome.style.display = "none";
+      viewPlayer.style.display = "flex";
+      playerChannelName.textContent = `${channel.number}. ${channel.name}`;
+      updateActiveButtonInBar();
+      showZappingToast(channel);
+      resetOverlayTimer();
+
+      tryCandidate(currentCandidateIdx);
+    }
+
+    function changeChannelRelative(delta) {
+      let next = (currentIndex + delta) % CHANNELS.length;
+      if (next < 0) next = CHANNELS.length - 1;
+      openChannel(next);
+    }
+
+    function advanceToNextCandidate(sessionId) {
+      if (sessionId !== playSessionId) return;
+      const nextIdx = currentCandidateIdx + 1;
+      if (nextIdx < currentCandidates.length) {
+        currentCandidateIdx = nextIdx;
+        tryCandidate(currentCandidateIdx);
+      } else {
+        stopCurrentMedia();
+        hideLoading();
+        const channel = CHANNELS[currentIndex];
+        noticeTitle.textContent = `Señal de ${channel.name} sin respuesta`;
+        noticeDesc.textContent = `Se probaron las ${currentCandidates.length} fuentes IPTV disponibles para ${channel.name}. Podés reintentar, cambiar de canal o configurar una lista M3U propia.`;
+        channelNotice.style.display = "flex";
+        btnNoticeRetry.focus();
+      }
+    }
+
+    async function tryCandidate(candIdx) {
+      playSessionId++;
+      const sessionId = playSessionId;
+      stopCurrentMedia();
+
+      const channel = CHANNELS[currentIndex];
+      const candidate = currentCandidates[candIdx];
+      if (!candidate) {
+        advanceToNextCandidate(sessionId);
+        return;
+      }
+
+      btnSwitchSource.textContent = `📡 SEÑAL IP (${candIdx + 1}/${currentCandidates.length})`;
+      sourceTypeBadge.textContent = candidate.label;
+      showLoading(`${channel.name}: Conectando ${candidate.label}...`);
+
+      let resolvedHlsUrl = null;
+      let useProxy = !!candidate.proxy;
+
+      try {
+        if (candidate.kind === "hls") {
+          resolvedHlsUrl = candidate.url;
+        } else if (candidate.kind === "telefe-token") {
+          const tokenUrl = getProxiedUrl(candidate.tokenApiUrl);
+          const resp = await fetch(tokenUrl);
+          if (!resp.ok) throw new Error("Error token Telefe");
+          const data = await resp.json();
+          if (sessionId !== playSessionId) return;
+          if (data && data.access_token) {
+            resolvedHlsUrl = `https://mdstrm.com/live-stream-playlist/${candidate.streamId}.m3u8?access_token=${data.access_token}`;
+            useProxy = true;
+          } else {
+            throw new Error("Sin access_token");
+          }
+        } else if (candidate.kind === "genoa-api") {
+          const resp = await fetch(candidate.apiUrl);
+          if (!resp.ok) throw new Error("Error Genoa API");
+          const text = await resp.text();
+          if (sessionId !== playSessionId) return;
+          const m3u8Match = text.match(/https?:\\?\/\\?\/[^"'\s]+\.m3u8[^"'\s]*/i);
+          if (m3u8Match) {
+            resolvedHlsUrl = m3u8Match[0].replace(/\\\//g, "/");
+            useProxy = false;
+          } else {
+            throw new Error("No m3u8 in Genoa");
+          }
+        } else if (candidate.kind === "web-m3u8-scraper") {
+          const resp = await fetch(getProxiedUrl(candidate.pageUrl));
+          if (!resp.ok) throw new Error("Error web scraper");
+          const html = await resp.text();
+          if (sessionId !== playSessionId) return;
+          const m3u8Match = html.match(/https?:\\?\/\\?\/[^"'\s<>]+\.m3u8[^"'\s<>]*/i);
+          if (m3u8Match) {
+            resolvedHlsUrl = m3u8Match[0].replace(/\\\//g, "/");
+            useProxy = true;
+          } else {
+            throw new Error("No .m3u8");
+          }
+        } else if (candidate.kind === "iptv-iframe") {
+          iframe.style.display = "block";
+          iframe.src = candidate.embedUrl;
+          setTimeout(() => {
+            if (sessionId === playSessionId) hideLoading();
+          }, 1500);
+          return;
+        }
+      } catch (err) {
+        advanceToNextCandidate(sessionId);
+        return;
+      }
+
+      if (!resolvedHlsUrl || sessionId !== playSessionId) {
+        advanceToNextCandidate(sessionId);
+        return;
+      }
+
+      playHlsUrl(resolvedHlsUrl, useProxy, sessionId);
+    }
+
+    function playHlsUrl(rawHlsUrl, shouldUseProxy, sessionId) {
+      video.style.display = "block";
+      const finalUrl = (shouldUseProxy && CLOUDFLARE_WORKER_URL) ? getProxiedUrl(rawHlsUrl) : rawHlsUrl;
+
+      watchdogTimer = setTimeout(() => {
+        if (sessionId === playSessionId) {
+          advanceToNextCandidate(sessionId);
+        }
+      }, 9500);
+
+      if (Hls.isSupported()) {
+        const hlsConfig = {
+          enableWorker: true,
+          lowLatencyMode: true,
+          backBufferLength: 45,
+          manifestLoadingTimeOut: 8000,
+          manifestLoadingMaxRetry: 1,
+          levelLoadingTimeOut: 8000,
+          fragLoadingTimeOut: 9000
+        };
+
+        if (shouldUseProxy && CLOUDFLARE_WORKER_URL) {
+          class CorsProxyLoader extends Hls.DefaultConfig.loader {
+            load(context, config, callbacks) {
+              if (context.url && !context.url.includes(CLOUDFLARE_WORKER_URL)) {
+                context.url = getProxiedUrl(context.url);
+              }
+              super.load(context, config, callbacks);
+            }
+          }
+          hlsConfig.loader = CorsProxyLoader;
+        }
+
+        hlsInstance = new Hls(hlsConfig);
+        hlsInstance.loadSource(finalUrl);
+        hlsInstance.attachMedia(video);
+
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+          if (sessionId !== playSessionId) return;
+          clearTimeout(watchdogTimer);
+          hideLoading();
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              video.muted = true;
+              video.play().catch(() => {});
+            });
+          }
+        });
+
+        hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+          if (sessionId !== playSessionId) return;
+          if (data.fatal) {
+            if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+              hlsInstance.recoverMediaError();
+            } else {
+              clearTimeout(watchdogTimer);
+              advanceToNextCandidate(sessionId);
+            }
+          }
+        });
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = finalUrl;
+        video.onloadedmetadata = () => {
+          if (sessionId !== playSessionId) return;
+          clearTimeout(watchdogTimer);
+          hideLoading();
+          video.play().catch(() => {
+            video.muted = true;
+            video.play();
+          });
+        };
+        video.onerror = () => {
+          if (sessionId !== playSessionId) return;
+          clearTimeout(watchdogTimer);
+          advanceToNextCandidate(sessionId);
+        };
+      }
+    }
+
+    btnSwitchSource.addEventListener("click", () => {
+      if (currentCandidates.length > 0) {
+        currentCandidateIdx = (currentCandidateIdx + 1) % currentCandidates.length;
+        tryCandidate(currentCandidateIdx);
+        resetOverlayTimer();
+      }
+    });
+
+    btnNoticeRetry.addEventListener("click", () => {
+      currentCandidateIdx = 0;
+      tryCandidate(0);
+    });
+
+    btnNoticeBack.addEventListener("click", () => {
+      closePlayer();
+    });
+
+    function closePlayer() {
+      playSessionId++;
+      clearTimeout(overlayTimeout);
+      stopCurrentMedia();
+      viewPlayer.style.display = "none";
+      viewHome.style.display = "flex";
+      renderChannelsGrid();
+      const currentCard = document.getElementById(`card-channel-${currentIndex}`);
+      if (currentCard) {
+        currentCard.focus();
+        currentCard.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }
+
+    btnBack.addEventListener("click", closePlayer);
+
+    /* ==========================================================================
+       8. NAVEGACIÓN Y CONTROL REMOTO UNIVERSAL (D-PAD / TECLADO ANDROID TV)
+       ========================================================================== */
+    let numericBuffer = "";
+    let numericBufferTimeout = null;
+
+    window.addEventListener("keydown", (e) => {
+      const isPlayerOpen = viewPlayer.style.display === "flex";
+      const isModalOpen = m3uConfigModal.style.display === "flex";
+
+      // Manejo de teclado numérico (soporta 1 a 18)
+      if (/^[0-9]$/.test(e.key)) {
+        numericBuffer += e.key;
+        clearTimeout(numericBufferTimeout);
+        numericBufferTimeout = setTimeout(() => {
+          const num = parseInt(numericBuffer, 10);
+          numericBuffer = "";
+          if (num >= 1 && num <= CHANNELS.length) {
+            openChannel(num - 1);
+          }
+        }, 900);
+        return;
+      }
+
+      // Tecla Back / Escape
+      if (e.key === "Escape" || e.key === "Backspace" || e.keyCode === 27 || e.keyCode === 4) {
+        if (isModalOpen) {
+          m3uConfigModal.style.display = "none";
+          document.getElementById("btn-open-m3u-config").focus();
+          e.preventDefault();
+          return;
+        }
+        if (isPlayerOpen) {
+          closePlayer();
+          e.preventDefault();
+          return;
+        }
+      }
+
+      // En el reproductor: Zapping directo con Flecha Izquierda / Derecha o Canal +/-
+      if (isPlayerOpen) {
+        if (playerOverlay.classList.contains("hidden")) {
+          if (e.key === "ArrowRight" || e.keyCode === 39 || e.keyCode === 166 /* Channel Up */) {
+            e.preventDefault();
+            changeChannelRelative(1);
+            return;
+          }
+          if (e.key === "ArrowLeft" || e.keyCode === 37 || e.keyCode === 167 /* Channel Down */) {
+            e.preventDefault();
+            changeChannelRelative(-1);
+            return;
+          }
+          if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Enter" || e.keyCode === 13) {
+            e.preventDefault();
+            toggleOverlay();
+            return;
+          }
+        } else {
+          resetOverlayTimer();
+        }
+      }
+    });
+
+    window.onAndroidBackPressed = function() {
+      if (m3uConfigModal.style.display === "flex") {
+        m3uConfigModal.style.display = "none";
+        document.getElementById("btn-open-m3u-config").focus();
+        return true;
+      }
+      if (viewPlayer.style.display === "flex") {
+        closePlayer();
+        return true;
+      }
+      return false;
+    };
+
+    window.onAndroidChannelUp = function() {
+      changeChannelRelative(1);
+    };
+
+    window.onAndroidChannelDown = function() {
+      changeChannelRelative(-1);
+    };
+
+    /* ==========================================================================
+       9. MODAL M3U
+       ========================================================================== */
+    const m3uConfigModal = document.getElementById("m3u-config-modal");
+    const inputCustomM3u = document.getElementById("input-custom-m3u");
+    inputCustomM3u.value = localStorage.getItem("mi_tele_custom_m3u") || "";
+
+    document.getElementById("btn-open-m3u-config").addEventListener("click", () => {
+      m3uConfigModal.style.display = "flex";
+      inputCustomM3u.focus();
+    });
+
+    document.getElementById("btn-close-m3u").addEventListener("click", () => {
+      m3uConfigModal.style.display = "none";
+      document.getElementById("btn-open-m3u-config").focus();
+    });
+
+    document.getElementById("btn-save-m3u").addEventListener("click", async () => {
+      const val = inputCustomM3u.value.trim();
+      if (val) {
+        localStorage.setItem("mi_tele_custom_m3u", val);
+      } else {
+        localStorage.removeItem("mi_tele_custom_m3u");
+      }
+      m3uConfigModal.style.display = "none";
+      await harvestAllM3uLists();
+      document.getElementById("btn-open-m3u-config").focus();
+    });
+
+    // Iniciar renderizado y foco inicial
+    window.addEventListener("load", () => {
+      renderChannelsGrid();
+      const firstCard = document.getElementById("card-channel-0");
+      if (firstCard) firstCard.focus();
+      harvestAllM3uLists();
+    });
+  </script>
+</body>
+</html>
