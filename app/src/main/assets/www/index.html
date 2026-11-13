@@ -667,9 +667,9 @@
 
       <!-- Filtro de Categorías con Control Remoto -->
       <div class="category-pills">
-        <button class="btn-pill active" id="pill-all" data-category="all" tabindex="0">⭐ Todos (18)</button>
-        <button class="btn-pill" id="pill-news" data-category="aire" tabindex="0">📺 Aire y Noticias (11)</button>
-        <button class="btn-pill" id="pill-sports" data-category="deportes" tabindex="0">⚽ Deportes y F1 (7)</button>
+        <button class="btn-pill active" id="pill-all" data-category="all" tabindex="0">⭐ Todos (11)</button>
+        <button class="btn-pill" id="pill-aire" data-category="aire" tabindex="0">📺 Aire (6)</button>
+        <button class="btn-pill" id="pill-noticias" data-category="noticias" tabindex="0">📰 Noticias (5)</button>
       </div>
 
       <div class="header-right">
@@ -689,7 +689,7 @@
         <div class="hint-item"><span class="key-badge">◄ ▲ ▼ ►</span> Navegar</div>
         <div class="hint-item"><span class="key-badge">OK</span> Sintonizar</div>
         <div class="hint-item"><span class="key-badge">ATRÁS</span> Salir / Grilla</div>
-        <div class="hint-item"><span class="key-badge">1 - 18</span> Número directo</div>
+        <div class="hint-item"><span class="key-badge">1 - 11</span> Número directo</div>
         <div class="hint-item"><span class="key-badge">S / AMARILLO</span> Cambiar Señal</div>
       </div>
       <div style="color: #38bdf8; font-weight: 800;">🟢 Servidores Conectados</div>
@@ -834,7 +834,7 @@
       {
         id: "tn",
         number: 1,
-        category: "aire",
+        category: "noticias",
         name: "TN",
         subtitle: "Todo Noticias",
         themeClass: "card-tn",
@@ -883,7 +883,7 @@
       {
         id: "c5n",
         number: 3,
-        category: "aire",
+        category: "noticias",
         name: "C5N",
         subtitle: "Noticias 24hs",
         themeClass: "card-c5n",
@@ -983,7 +983,7 @@
       {
         id: "a24",
         number: 7,
-        category: "aire",
+        category: "noticias",
         name: "A24",
         subtitle: "América 24",
         themeClass: "card-a24",
@@ -1031,7 +1031,7 @@
       {
         id: "lnmas",
         number: 9,
-        category: "aire",
+        category: "noticias",
         name: "LN+",
         subtitle: "La Nación +",
         themeClass: "card-lnmas",
@@ -1053,7 +1053,7 @@
       {
         id: "cronica",
         number: 10,
-        category: "aire",
+        category: "noticias",
         name: "Crónica",
         subtitle: "Firme junto al pueblo",
         themeClass: "card-cronica",
@@ -1093,169 +1093,6 @@
             <rect width="100" height="100" rx="20" fill="#14532d"/>
             <path d="M50 20 C65 35 65 65 50 80 C35 65 35 35 50 20 Z" fill="#84cc16"/>
             <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">RURAL</text>
-          </svg>
-        `
-      },
-
-      // --- DEPORTES Y F1 (MULTI-SEÑAL CON SELECTOR Y RESCATE DE PANTALLA NEGRA) ---
-      {
-        id: "espn",
-        number: 12,
-        category: "deportes",
-        name: "ESPN",
-        subtitle: "El líder mundial",
-        themeClass: "card-espn",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Servidor Directo #1", type: "hls", url: "https://tvsen7.aynascope.net/espn/index.m3u8", useProxy: false },
-          { label: "Servidor Proxy IP #2", type: "hls", url: "https://tvsen7.aynascope.net/espn/index.m3u8", useProxy: true },
-          { label: "Servidor HLS Alternativo #3", type: "hls", url: "https://clarovideo.serviciotv.fun/cv/espn.m3u8", useProxy: false },
-          { label: "Servidor Web #4", type: "embed", url: "https://ragnartv.org/embed/espn" }
-        ],
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#18181b"/>
-            <text x="50" y="62" font-family="sans-serif" font-weight="900" font-size="30" font-style="italic" fill="#dc2626" text-anchor="middle">ESPN</text>
-            <line x1="12" y1="44" x2="88" y2="44" stroke="#ffffff" stroke-width="2.5"/>
-          </svg>
-        `
-      },
-      {
-        id: "espn2",
-        number: 13,
-        category: "deportes",
-        name: "ESPN 2",
-        subtitle: "Deportes internacionales",
-        themeClass: "card-espn2",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Servidor Directo #1", type: "hls", url: "https://tvsen7.aynascope.net/espn2/index.m3u8", useProxy: false },
-          { label: "Servidor Proxy IP #2", type: "hls", url: "https://tvsen7.aynascope.net/espn2/index.m3u8", useProxy: true },
-          { label: "Servidor HLS Alternativo #3", type: "hls", url: "https://clarovideo.serviciotv.fun/cv/espn2.m3u8", useProxy: false },
-          { label: "Servidor Web #4", type: "embed", url: "https://ragnartv.org/embed/espn2" }
-        ],
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#27272a"/>
-            <text x="42" y="62" font-family="sans-serif" font-weight="900" font-size="26" font-style="italic" fill="#dc2626" text-anchor="middle">ESPN</text>
-            <text x="80" y="62" font-family="sans-serif" font-weight="900" font-size="34" fill="#facc15" text-anchor="middle">2</text>
-            <line x1="10" y1="45" x2="72" y2="45" stroke="#ffffff" stroke-width="2"/>
-          </svg>
-        `
-      },
-      {
-        id: "foxsports",
-        number: 14,
-        category: "deportes",
-        name: "Fox Sports",
-        subtitle: "Deportes en vivo",
-        themeClass: "card-foxsports",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Servidor Directo #1", type: "hls", url: "https://tvsen7.aynascope.net/foxsports2/index.m3u8", useProxy: false },
-          { label: "Servidor Proxy IP #2", type: "hls", url: "https://tvsen7.aynascope.net/foxsports2/index.m3u8", useProxy: true },
-          { label: "Servidor Web #3", type: "embed", url: "https://ragnartv.org/embed/foxsports" }
-        ],
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#1e3a8a"/>
-            <circle cx="50" cy="50" r="38" fill="#1d4ed8" stroke="#f59e0b" stroke-width="3"/>
-            <text x="50" y="58" font-family="sans-serif" font-weight="900" font-size="24" fill="#ffffff" text-anchor="middle">FOX</text>
-            <text x="50" y="74" font-family="sans-serif" font-weight="800" font-size="10" fill="#facc15" text-anchor="middle">SPORTS</text>
-          </svg>
-        `
-      },
-      {
-        id: "dsports",
-        number: 15,
-        category: "deportes",
-        name: "DSports",
-        subtitle: "DirecTV Sports",
-        themeClass: "card-dsports",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Servidor Directo Bold #1", type: "hls", url: "https://barinaslive1.boldmss.com/DIRECTV/DIRECTV.isml/DIRECTV.m3u8", useProxy: false },
-          { label: "Servidor Bold vía Proxy #2", type: "hls", url: "https://barinaslive1.boldmss.com/DIRECTV/DIRECTV.isml/DIRECTV.m3u8", useProxy: true },
-          { label: "Servidor Web #3", type: "embed", url: "https://ragnartv.org/embed/dsports" }
-        ],
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#0c4a6e"/>
-            <path d="M26 24 L56 24 C72 24 82 34 82 50 C82 66 72 76 56 76 L26 76 Z" fill="#0284c7"/>
-            <path d="M42 38 L54 38 C62 38 66 42 66 50 C66 58 62 62 54 62 L42 62 Z" fill="#0c4a6e"/>
-            <text x="50" y="90" font-family="sans-serif" font-weight="900" font-size="11" fill="#38bdf8" text-anchor="middle">SPORTS</text>
-          </svg>
-        `
-      },
-      {
-        id: "daznf1",
-        number: 16,
-        category: "deportes",
-        name: "DAZN F1",
-        subtitle: "Fórmula 1 en vivo",
-        themeClass: "card-daznf1",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Servidor Directo #1", type: "hls", url: "https://tvsen7.aynascope.net/daznf1/index.m3u8", useProxy: false },
-          { label: "Servidor Proxy IP #2", type: "hls", url: "https://tvsen7.aynascope.net/daznf1/index.m3u8", useProxy: true },
-          { label: "Servidor Web #3", type: "embed", url: "https://ragnartv.org/embed/daznf1" }
-        ],
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#18181b"/>
-            <text x="50" y="44" font-family="sans-serif" font-weight="900" font-size="18" fill="#ffffff" text-anchor="middle">DAZN</text>
-            <text x="50" y="78" font-family="sans-serif" font-weight="900" font-size="36" font-style="italic" fill="#ef4444" text-anchor="middle">F1</text>
-          </svg>
-        `
-      },
-      {
-        id: "espnpremium",
-        number: 17,
-        category: "deportes",
-        name: "ESPN Premium",
-        subtitle: "Fútbol Argentino",
-        themeClass: "card-espnpremium",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Servidor Directo #1", type: "hls", url: "https://smjt9q.envivoslatam.org/espnpremium/mono.m3u8", useProxy: false },
-          { label: "Servidor Proxy IP #2", type: "hls", url: "https://smjt9q.envivoslatam.org/espnpremium/mono.m3u8", useProxy: true },
-          { label: "Servidor Web #3", type: "embed", url: "https://ragnartv.org/embed/espnpremium" }
-        ],
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#064e3b"/>
-            <text x="50" y="46" font-family="sans-serif" font-weight="900" font-size="22" font-style="italic" fill="#dc2626" text-anchor="middle">ESPN</text>
-            <rect x="14" y="56" width="72" height="24" rx="6" fill="#facc15"/>
-            <text x="50" y="73" font-family="sans-serif" font-weight="900" font-size="11" fill="#000000" text-anchor="middle">PREMIUM</text>
-          </svg>
-        `
-      },
-      {
-        id: "tntsports",
-        number: 18,
-        category: "deportes",
-        name: "TNT Sports",
-        subtitle: "Pasión Nacional",
-        themeClass: "card-tntsports",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Servidor Directo #1", type: "hls", url: "https://smjt9q.envivoslatam.org/tntsports/tracks-v1a1/mono.m3u8", useProxy: false },
-          { label: "Servidor Proxy IP #2", type: "hls", url: "https://smjt9q.envivoslatam.org/tntsports/tracks-v1a1/mono.m3u8", useProxy: true },
-          { label: "Servidor Web #3", type: "embed", url: "https://ragnartv.org/embed/tntsports" }
-        ],
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#3b0764"/>
-            <circle cx="50" cy="42" r="26" fill="#f43f5e"/>
-            <text x="50" y="50" font-family="sans-serif" font-weight="900" font-size="18" fill="#ffffff" text-anchor="middle">TNT</text>
-            <text x="50" y="84" font-family="sans-serif" font-weight="900" font-size="13" fill="#facc15" text-anchor="middle">SPORTS</text>
           </svg>
         `
       }
