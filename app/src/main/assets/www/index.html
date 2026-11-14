@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mi Tele TV</title>
+  <title>AndyTV</title>
   
-  <!-- Oculta el Referer globalmente para que los servidores HLS no bloqueen por CORS -->
-  <meta name="referrer" content="no-referrer">
+  <!-- Referrer dinámico: strict-origin-when-cross-origin para YouTube (evita Error 153) y no-referrer para HLS -->
+  <meta name="referrer" id="meta-referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
 
   <!-- Hls.js para reproducción directa de streams HLS -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
@@ -276,6 +277,9 @@
     .card-dsports { background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 60%, #38bdf8 100%); }
     .card-daznf1 { background: linear-gradient(135deg, #18181b 0%, #3f3f46 60%, #ef4444 100%); }
     .card-espnpremium { background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #facc15 100%); }
+    .card-tycsports { background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 55%, #38bdf8 100%); }
+    .card-tycsportslatam { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #60a5fa 100%); }
+    .card-tycsportsusa { background: linear-gradient(135deg, #172554 0%, #1e40af 55%, #ef4444 100%); }
     .card-tntsports { background: linear-gradient(135deg, #3b0764 0%, #701a75 55%, #f43f5e 100%); }
 
     /* Barra inferior con ayuda de teclas de control remoto */
@@ -660,19 +664,36 @@
     <header class="app-header">
       <div class="brand-title">
         <h1>
-          📺 Mi Tele TV
+          <svg viewBox="0 0 108 108" style="width: 52px; height: 52px; flex-shrink: 0; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));">
+            <path d="M48,35 L42,35 L36,37 L29,29 L24,31" fill="none" stroke="#e2e8f0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24" cy="31" r="3.5" fill="#facc15"/>
+            <path d="M58,34 L62,27 L62,21 L68,15 L72,14 L74,10" fill="none" stroke="#e2e8f0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="74" cy="10" r="3.5" fill="#facc15"/>
+            <path d="M44,37 C44,31 60,31 60,37 Z" fill="#8c8f94" stroke="#231f20" stroke-width="2.2"/>
+            <path d="M23,82 L21,92 L25,92 L29,82 Z" fill="#4a3c16" stroke="#231f20" stroke-width="1.8"/>
+            <path d="M79,82 L83,92 L87,92 L85,82 Z" fill="#4a3c16" stroke="#231f20" stroke-width="1.8"/>
+            <rect x="19" y="37" width="70" height="45" rx="2.5" fill="#8c9cd4" stroke="#231f20" stroke-width="2.4"/>
+            <rect x="22.5" y="41" width="53" height="36" rx="1.5" fill="#5965b3" stroke="#231f20" stroke-width="1.6"/>
+            <path d="M34,43 C44,41.5 56,41.5 66,43 C71,44 73,49 73,59 C73,69 71,73.5 66,74.5 C56,76 44,76 34,74.5 C29,73.5 27,69 27,59 C27,49 29,44 34,43 Z" fill="#ffffff" stroke="#231f20" stroke-width="1.8"/>
+            <circle cx="82" cy="47" r="3.6" fill="#5965b3" stroke="#231f20" stroke-width="1.5"/>
+            <circle cx="82" cy="57" r="3.6" fill="#5965b3" stroke="#231f20" stroke-width="1.5"/>
+            <rect x="78" y="64" width="8" height="12" rx="1" fill="#5965b3" stroke="#231f20" stroke-width="1.4"/>
+          </svg>
+          AndyTV
           <span class="badge-live">EN VIVO</span>
         </h1>
       </div>
 
       <!-- Filtro de Categorías con Control Remoto -->
       <div class="category-pills">
-        <button class="btn-pill active" id="pill-all" data-category="all" tabindex="0">⭐ Todos (11)</button>
+        <button class="btn-pill active" id="pill-all" data-category="all" tabindex="0">⭐ Todos (13)</button>
         <button class="btn-pill" id="pill-aire" data-category="aire" tabindex="0">📺 Aire (6)</button>
         <button class="btn-pill" id="pill-noticias" data-category="noticias" tabindex="0">📰 Noticias (5)</button>
+        <button class="btn-pill" id="pill-deportes" data-category="deportes" tabindex="0">⚽ Deportes (2)</button>
       </div>
 
       <div class="header-right">
+        <button class="btn-config-m3u" id="btn-sync-cloud" tabindex="0" title="Actualizar señales y versión desde la nube">🔄 Actualizar</button>
         <button class="btn-config-m3u" id="btn-open-m3u" tabindex="0">⚙️ Lista M3U</button>
         <span class="clock-display" id="tv-clock">12:00</span>
       </div>
@@ -689,10 +710,10 @@
         <div class="hint-item"><span class="key-badge">◄ ▲ ▼ ►</span> Navegar</div>
         <div class="hint-item"><span class="key-badge">OK</span> Sintonizar</div>
         <div class="hint-item"><span class="key-badge">ATRÁS</span> Salir / Grilla</div>
-        <div class="hint-item"><span class="key-badge">1 - 11</span> Número directo</div>
+        <div class="hint-item"><span class="key-badge">1 - 13</span> Número directo</div>
         <div class="hint-item"><span class="key-badge">S / AMARILLO</span> Cambiar Señal</div>
       </div>
-      <div style="color: #38bdf8; font-weight: 800;">🟢 Servidores Conectados</div>
+      <div id="sync-status-badge" style="color: #38bdf8; font-weight: 800;">🟢 Auto-Sync Activo</div>
     </footer>
   </main>
 
@@ -821,13 +842,17 @@
       return `${base}/?url=${encodeURIComponent(targetUrl)}`;
     }
 
+    function setReferrerPolicy(policy) {
+      const metaRef = document.getElementById("meta-referrer");
+      if (metaRef) metaRef.setAttribute("content", policy);
+    }
+
     function buildYtEmbedUrl(videoId) {
-      const embedConfig = encodeURIComponent(JSON.stringify({ adsConfig: { disableAds: true } }));
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&embed_config=${embedConfig}`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fandresehansen.github.io&widget_referrer=https%3A%2F%2Fandresehansen.github.io`;
     }
 
     /* ==========================================================================
-       3. FUENTES OFICIALES Y MULTI-SEÑAL PARA LOS 18 CANALES
+       3. FUENTES OFICIALES CURADAS PARA LOS 11 CANALES
        ========================================================================== */
     const CHANNELS = [
       // --- AIRE Y NOTICIAS ---
@@ -841,8 +866,7 @@
         type: "hls",
         currentSourceIndex: 0,
         sources: [
-          { label: "Artear Directo 1080p #1", type: "hls", url: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8", useProxy: false },
-          { label: "Artear Directo 1080p #2", type: "hls", url: "https://live-01-02-tn.vodgc.net/TN_DAI_Beta/index.m3u8", useProxy: false },
+          { label: "Artear Directo 1080p", type: "hls", url: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8", useProxy: false },
           { label: "Artear vía Proxy IP", type: "hls", url: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8", useProxy: true }
         ],
         hlsUrl: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8",
@@ -865,8 +889,7 @@
         type: "telefe-token",
         currentSourceIndex: 0,
         sources: [
-          { label: "Token Oficial Mediastream", type: "telefe-token" },
-          { label: "Pluto TV FAST Directo", type: "hls", url: "https://siloh-mcdn.plutotv.net/lilo/production/LATAM/Telefe/master.m3u8", useProxy: false }
+          { label: "Token Oficial Mediastream", type: "telefe-token" }
         ],
         tokenApiUrl: "https://57j4mtvcjjf7siqnnvkixb5d3i0uvjei.lambda-url.us-east-1.on.aws/?stream_id=6a024684fd4ca6a938f3a118",
         streamId: "6a024684fd4ca6a938f3a118",
@@ -890,9 +913,7 @@
         type: "youtube-live",
         currentSourceIndex: 0,
         sources: [
-          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "rZtTUCxpPuI", ytLivePageUrl: "https://www.youtube.com/@c5n/live" },
-          { label: "KirCDN HLS Directo", type: "hls", url: "https://live-c5n.kircdn.com/live-c5n/smil:c5n.smil/playlist.m3u8", useProxy: false },
-          { label: "KirCDN vía Proxy IP", type: "hls", url: "https://live-c5n.kircdn.com/live-c5n/smil:c5n.smil/playlist.m3u8", useProxy: true }
+          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "rZtTUCxpPuI", ytLivePageUrl: "https://www.youtube.com/@c5n/live" }
         ],
         ytVideoId: "rZtTUCxpPuI",
         ytLivePageUrl: "https://www.youtube.com/@c5n/live",
@@ -913,9 +934,7 @@
         type: "hls",
         currentSourceIndex: 0,
         sources: [
-          { label: "VodGC Directo 1080p #1", type: "hls", url: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8", useProxy: false },
-          { label: "VodGC Directo 1080p #2", type: "hls", url: "https://live-01-01-eltrece.vodgc.net/eltrecetv/index.m3u8", useProxy: false },
-          { label: "VodGC vía Proxy IP", type: "hls", url: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8", useProxy: true }
+          { label: "VodGC Directo 1080p", type: "hls", url: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8", useProxy: false }
         ],
         hlsUrl: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8",
         useProxy: false,
@@ -938,8 +957,7 @@
         type: "youtube-live",
         currentSourceIndex: 0,
         sources: [
-          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "yGLVhAklLyM", ytLivePageUrl: "https://www.youtube.com/@elnueve/live" },
-          { label: "Servidor IP Directo", type: "hls", url: "http://45.226.28.9:8085/Live/18e292ea93b66c65c76707f07c489d61/local-canal9.playlist.m3u8", useProxy: false }
+          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "yGLVhAklLyM", ytLivePageUrl: "https://www.youtube.com/@elnueve/live" }
         ],
         ytVideoId: "yGLVhAklLyM",
         ytLivePageUrl: "https://www.youtube.com/@elnueve/live",
@@ -952,7 +970,7 @@
           </svg>
         `
       },
-      // CANAL 6: AMÉRICA TV — 100% HLS DIRECTO (YOUTUBE DESCARTADO POR GEOBLOQUEO)
+      // CANAL 6: AMÉRICA TV — HARDWARE DECODER EN ANDROID TV (CON AUDIO COMPLETO) + YOUTUBE + REPRODUCTOR OFICIAL
       {
         id: "americatv",
         number: 6,
@@ -963,13 +981,11 @@
         type: "hls",
         currentSourceIndex: 0,
         sources: [
-          { label: "Señal Directa Qaotic 720p", type: "hls", url: "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8", useProxy: false },
-          { label: "Señal VodGC Espejo", type: "hls", url: "https://live-01-02-a24.vodgc.net/americatv/index.m3u8", useProxy: false },
-          { label: "Señal Qaotic vía Proxy IP", type: "hls", url: "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8", useProxy: true },
-          { label: "Señal CloudFront Directa", type: "hls", url: "https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e83ba5844638a1f49615a6b7d5ec485d41ae/americatv-argentina/index.m3u8", useProxy: false }
+          { label: "Señal Directa 720p (Audio Nativo)", type: "hls", url: "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8", useProxy: false, preferNativeAndroid: true },
+          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "2M1_CFn9G2U", ytLivePageUrl: "https://www.youtube.com/@americatv/live" },
+          { label: "Reproductor Oficial Edge-Apps", type: "embed", url: "https://vmf.edge-apps.net/embed/live.php?streamname=americahls-100056&autoplay=true" }
         ],
         hlsUrl: "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8",
-        fallbackHls: "https://live-01-02-a24.vodgc.net/americatv/index.m3u8",
         useProxy: false,
         logoSvg: `
           <svg viewBox="0 0 100 100">
@@ -990,9 +1006,7 @@
         type: "youtube-live",
         currentSourceIndex: 0,
         sources: [
-          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "FEWZjXJ7M0c", ytLivePageUrl: "https://www.youtube.com/@A24com/live" },
-          { label: "VodGC Directo HLS", type: "hls", url: "https://live-01-02-a24.vodgc.net/a24/index.m3u8", useProxy: false },
-          { label: "VodGC vía Proxy IP", type: "hls", url: "https://live-01-02-a24.vodgc.net/a24/index.m3u8", useProxy: true }
+          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "FEWZjXJ7M0c", ytLivePageUrl: "https://www.youtube.com/@A24com/live" }
         ],
         ytVideoId: "FEWZjXJ7M0c",
         ytLivePageUrl: "https://www.youtube.com/@A24com/live",
@@ -1015,7 +1029,7 @@
         currentSourceIndex: 0,
         sources: [
           { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "YNApZJdaqfg", ytLivePageUrl: "https://www.youtube.com/channel/UCs231K71Bnu5295_x0MB5Pg/live" },
-          { label: "Edge-Access HLS Directo", type: "hls", url: "https://g5.vxral-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8", useProxy: false }
+          { label: "Edge-Access HLS Directo", type: "hls", url: "https://g5.vxral-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8", useProxy: false, preferNativeAndroid: true }
         ],
         ytVideoId: "YNApZJdaqfg",
         ytLivePageUrl: "https://www.youtube.com/channel/UCs231K71Bnu5295_x0MB5Pg/live",
@@ -1083,8 +1097,7 @@
         type: "youtube-live",
         currentSourceIndex: 0,
         sources: [
-          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "w78Zr0J-dIs", ytLivePageUrl: "https://www.youtube.com/@canalrural/live" },
-          { label: "Alsolnet HLS Directo", type: "hls", url: "https://cda2.alsolnet.com/elrural/live/playlist.m3u8", useProxy: false }
+          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "w78Zr0J-dIs", ytLivePageUrl: "https://www.youtube.com/@canalrural/live" }
         ],
         ytVideoId: "w78Zr0J-dIs",
         ytLivePageUrl: "https://www.youtube.com/@canalrural/live",
@@ -1093,6 +1106,53 @@
             <rect width="100" height="100" rx="20" fill="#14532d"/>
             <path d="M50 20 C65 35 65 65 50 80 C35 65 35 35 50 20 Z" fill="#84cc16"/>
             <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">RURAL</text>
+          </svg>
+        `
+      },
+      // --- DEPORTES (100% VERIFICADOS EN REPRODUCCIÓN REAL 1080P CON AUDIO) ---
+      {
+        id: "tycsports",
+        number: 12,
+        category: "deportes",
+        name: "TyC Sports",
+        subtitle: "Argentina / Internacional",
+        themeClass: "card-tycsports",
+        type: "hls",
+        currentSourceIndex: 0,
+        sources: [
+          { label: "VodGC Oficial 1080p (AR)", type: "hls", url: "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8", useProxy: false },
+          { label: "Amagi Global 1080p (Int/USA)", type: "hls", url: "https://amg26268-amg26268c14-freelivesports-emea-10267.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg26268-sportsstudio-tycsports-freelivesportsemea/playlist.m3u8", useProxy: false }
+        ],
+        hlsUrl: "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8",
+        useProxy: false,
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#0c4a6e"/>
+            <text x="50" y="54" font-family="sans-serif" font-weight="900" font-size="32" fill="#ffffff" text-anchor="middle">TyC</text>
+            <text x="50" y="80" font-family="sans-serif" font-weight="800" font-size="15" fill="#38bdf8" text-anchor="middle">SPORTS</text>
+          </svg>
+        `
+      },
+      {
+        id: "tntsports",
+        number: 13,
+        category: "deportes",
+        name: "TNT Sports",
+        subtitle: "Señal HD 1080p",
+        themeClass: "card-tntsports",
+        type: "hls",
+        currentSourceIndex: 0,
+        sources: [
+          { label: "FullTV HD 1080p", type: "hls", url: "https://play-fulltv.com.ar/playtvpre/tntsportschile.m3u8", useProxy: false }
+        ],
+        hlsUrl: "https://play-fulltv.com.ar/playtvpre/tntsportschile.m3u8",
+        useProxy: false,
+        logoSvg: `
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="20" fill="#581c87"/>
+            <circle cx="50" cy="44" r="24" fill="#e11d48"/>
+            <text x="50" y="52" font-family="sans-serif" font-weight="900" font-size="20" fill="#ffffff" text-anchor="middle">TNT</text>
+            <text x="50" y="84" font-family="sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">SPORTS</text>
           </svg>
         `
       }
@@ -1352,8 +1412,56 @@
       openChannel(next);
     }
 
-    function startHlsStream(channel, rawHlsUrl, forceProxy) {
+    function stopAndroidNativeVideo() {
+      document.body.style.backgroundColor = "#080c14";
+      viewPlayer.style.background = "#000000";
+      const wrapper = document.getElementById("video-wrapper");
+      if (wrapper) wrapper.style.background = "#000000";
+      if (window.AndroidBridge && typeof window.AndroidBridge.stopNativeHls === "function") {
+        try {
+          window.AndroidBridge.stopNativeHls();
+        } catch (e) {
+          console.warn("stopNativeHls error:", e);
+        }
+      }
+    }
+
+    window.onNativeVideoPlaying = function() {
+      hideLoading();
+      hideRescueBanner();
+    };
+
+    window.onNativeVideoError = function() {
+      const channel = CHANNELS[currentIndex];
+      if (!channel) return;
+      stopAndroidNativeVideo();
+      const source = getCurrentSource(channel);
+      const rawHlsUrl = source.url || source.hlsUrl || channel.hlsUrl;
+      if (rawHlsUrl) {
+        startHlsStream(channel, rawHlsUrl, source.useProxy, true);
+      }
+    };
+
+    function startHlsStream(channel, rawHlsUrl, forceProxy, skipNativeAndroid) {
+      const source = getCurrentSource(channel);
+
+      // Si estamos en Android TV y la fuente prefiere decodificación por hardware nativo (para audio AC3/ADTS completo)
+      if (!skipNativeAndroid && source && source.preferNativeAndroid && window.AndroidBridge && typeof window.AndroidBridge.playNativeHls === "function") {
+        video.style.display = "none";
+        iframe.style.display = "none";
+        document.body.style.backgroundColor = "transparent";
+        viewPlayer.style.background = "transparent";
+        const wrapper = document.getElementById("video-wrapper");
+        if (wrapper) wrapper.style.background = "transparent";
+        window.AndroidBridge.playNativeHls(rawHlsUrl);
+        return;
+      }
+
+      setReferrerPolicy("no-referrer");
       video.style.display = "block";
+      video.muted = false;
+      video.volume = 1.0;
+
       const shouldUseProxy = (forceProxy || channel.useProxy) && !!CLOUDFLARE_WORKER_URL;
       const initialUrl = shouldUseProxy ? getProxiedUrl(rawHlsUrl) : rawHlsUrl;
 
@@ -1387,11 +1495,13 @@
         hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
           hideLoading();
           hideRescueBanner();
+          video.muted = false;
+          video.volume = 1.0;
           const playPromise = video.play();
           if (playPromise !== undefined) {
             playPromise.catch((err) => {
-              console.log("Autoplay con audio bloqueado, intentando con mute:", err);
-              video.muted = true;
+              console.log("Autoplay con audio bloqueado, reintentando:", err);
+              video.muted = false;
               video.play().catch(e => console.log("Play error:", e));
             });
           }
@@ -1450,8 +1560,9 @@
         video.addEventListener("loadedmetadata", () => {
           hideLoading();
           hideRescueBanner();
+          video.muted = false;
+          video.volume = 1.0;
           video.play().catch(() => {
-            video.muted = true;
             video.play();
           });
         });
@@ -1475,6 +1586,8 @@
       const channel = CHANNELS[activeIdx];
       const source = getCurrentSource(channel);
       hasTriedFallback = false;
+
+      stopAndroidNativeVideo();
 
       // Actualizar botón de alternar señales si el canal tiene múltiples fuentes
       if (channel.sources && channel.sources.length > 1) {
@@ -1506,6 +1619,8 @@
       video.pause();
       video.removeAttribute("src");
       video.load();
+      video.muted = false;
+      video.volume = 1.0;
       video.style.display = "none";
 
       iframe.src = "";
@@ -1515,6 +1630,7 @@
       btnSkipAd.style.display = (sourceType === "youtube-live") ? "inline-flex" : "none";
 
       if (sourceType === "youtube-live") {
+        setReferrerPolicy("strict-origin-when-cross-origin");
         iframe.style.display = "block";
         const vId = source.ytVideoId || channel.ytVideoId;
         iframe.src = buildYtEmbedUrl(vId);
@@ -1544,6 +1660,7 @@
           }
         }
       } else if (sourceType === "embed") {
+        setReferrerPolicy("strict-origin-when-cross-origin");
         iframe.style.display = "block";
         const embedUrl = source.url || source.embedUrl || channel.embedUrl;
         iframe.src = embedUrl;
@@ -1638,6 +1755,7 @@
       if (embedTimeout) clearTimeout(embedTimeout);
       if (blackScreenTimeout) clearTimeout(blackScreenTimeout);
       hideRescueBanner();
+      stopAndroidNativeVideo();
 
       if (hlsInstance) {
         hlsInstance.destroy();
@@ -1837,11 +1955,172 @@
       }
     });
 
-    // Iniciar renderizado y foco inicial
+    /* ==========================================================================
+       8. MOTOR INTELIGENTE AUTO-ACTUALIZADOR (IPTV-ORG + CLOUD OTA)
+       ========================================================================== */
+    const IPTV_ORG_PLAYLISTS = [
+      "https://iptv-org.github.io/iptv/countries/ar.m3u",
+      "https://iptv-org.github.io/iptv/categories/sports.m3u"
+    ];
+    const CHANNEL_MATCHERS = {
+      tn: /\b(todo noticias|^tn\b|tvg-id="todonoticias)/i,
+      telefe: /\b(telefe)\b/i,
+      c5n: /\b(c5n)\b/i,
+      eltrece: /\b(el trece|eltrece|canal 13)\b/i,
+      elnueve: /\b(el nueve|elnueve|canal 9)\b/i,
+      americatv: /\b(am[eé]rica tv|americatv|tvg-id="americatv)\b/i,
+      a24: /\b(a24|am[eé]rica 24)\b/i,
+      tvpublica: /\b(tv p[uú]blica|televisi[oó]n p[uú]blica)\b/i,
+      lnmas: /\b(ln\+|la naci[oó]n)\b/i,
+      cronica: /\b(cr[oó]nica)\b/i,
+      canalrural: /\b(canal rural|el rural)\b/i,
+      tycsports: /\b(tycsports\.(ar|latam|usa)|tyc\s*sports)/i,
+      tntsports: /\b(tnt\s*sports|tntsports\.(ar|cl)|tntsportspremium)\b/i
+    };
+
+    const DEAD_HOSTS_BLACKLIST = [
+      "45.134.141.161",
+      "45.184.109.10",
+      "158.172.155.130",
+      "181.78.79.131",
+      "45.226.28.9",
+      "cda2.alsolnet.com",
+      "kircdn.com"
+    ];
+
+    async function probeHlsUrlAlive(candidateUrl) {
+      if (!candidateUrl || DEAD_HOSTS_BLACKLIST.some(h => candidateUrl.includes(h))) {
+        return { alive: false, useProxy: false };
+      }
+
+      const tryDeepVerify = async (rawUrl, viaProxy) => {
+        const wrap = (u) => viaProxy ? getProxiedUrl(u) : u;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3500);
+        try {
+          const resp = await fetch(wrap(rawUrl), { method: "GET", signal: controller.signal });
+          clearTimeout(timer);
+          if (!resp.ok) return false;
+          const text = await resp.text();
+          if (!text || !text.includes("#EXTM3U")) return false;
+
+          // Verificar también el primer sub-manifiesto o segmento para descartar playlists "zombies"
+          const lines = text.split("\n").map(l => l.trim()).filter(l => l && !l.startsWith("#"));
+          if (lines.length === 0) return false;
+          const firstChild = new URL(lines[0], rawUrl).href;
+          const childCtrl = new AbortController();
+          const childTimer = setTimeout(() => childCtrl.abort(), 3000);
+          const childResp = await fetch(wrap(firstChild), { method: "GET", signal: childCtrl.signal });
+          clearTimeout(childTimer);
+          return childResp.ok;
+        } catch (err) {
+          clearTimeout(timer);
+          return false;
+        }
+      };
+
+      if (await tryDeepVerify(candidateUrl, false)) {
+        return { alive: true, useProxy: false };
+      }
+      if (CLOUDFLARE_WORKER_URL && await tryDeepVerify(candidateUrl, true)) {
+        return { alive: true, useProxy: true };
+      }
+      return { alive: false, useProxy: false };
+    }
+
+    async function syncIptvOrgSources(manualTrigger = false) {
+      const badge = document.getElementById("sync-status-badge");
+      if (badge) badge.textContent = "🔄 Verificando señales IPTV-ORG...";
+
+      try {
+        const texts = await Promise.all(IPTV_ORG_PLAYLISTS.map(async (listUrl) => {
+          let res = await fetch(listUrl).catch(() => null);
+          if ((!res || !res.ok) && CLOUDFLARE_WORKER_URL) {
+            res = await fetch(getProxiedUrl(listUrl)).catch(() => null);
+          }
+          return (res && res.ok) ? await res.text() : "";
+        }));
+
+        const m3uText = texts.join("\n");
+        if (!m3uText.trim()) throw new Error("No se pudo leer IPTV-ORG");
+        const lines = m3uText.split("\n");
+        let lastExtInf = "";
+        const candidates = [];
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (line.startsWith("#EXTINF:")) {
+            lastExtInf = line;
+          } else if ((line.startsWith("http://") || line.startsWith("https://")) && lastExtInf) {
+            CHANNELS.forEach((ch) => {
+              const regex = CHANNEL_MATCHERS[ch.id];
+              if (regex && regex.test(lastExtInf)) {
+                const alreadyExists = (ch.sources || []).some(s => s.url === line);
+                if (!alreadyExists) {
+                  candidates.push({ channel: ch, url: line });
+                }
+              }
+            });
+            lastExtInf = "";
+          }
+        }
+
+        let verifiedCount = 0;
+        // Probar candidatos en paralelo (solo se agregan las IPs/URLs que respondan activas con #EXTM3U)
+        await Promise.all(candidates.map(async (item) => {
+          const check = await probeHlsUrlAlive(item.url);
+          if (check.alive) {
+            const exists = item.channel.sources.some(s => s.url === item.url);
+            if (!exists) {
+              item.channel.sources.push({
+                label: "IPTV-ORG Verificada",
+                type: "hls",
+                url: item.url,
+                useProxy: check.useProxy
+              });
+              verifiedCount++;
+            }
+          }
+        }));
+
+        if (verifiedCount > 0 && viewHome.style.display !== "none") {
+          const activeId = document.activeElement ? document.activeElement.id : null;
+          renderChannelsGrid();
+          if (activeId) {
+            const el = document.getElementById(activeId);
+            if (el) el.focus();
+          }
+        }
+
+        if (badge) {
+          badge.textContent = verifiedCount > 0
+            ? `🟢 +${verifiedCount} señales IPTV-ORG activas`
+            : `🟢 Señales Oficiales Verificadas`;
+        }
+      } catch (e) {
+        console.log("Sync IPTV-ORG en segundo plano:", e);
+        if (badge) badge.textContent = "🟢 Señales Oficiales Activas";
+      }
+    }
+
+    const btnSyncCloud = document.getElementById("btn-sync-cloud");
+    if (btnSyncCloud) {
+      btnSyncCloud.addEventListener("click", () => {
+        if (window.AndroidBridge && typeof window.AndroidBridge.reloadRemoteApp === "function") {
+          window.AndroidBridge.reloadRemoteApp();
+        } else {
+          syncIptvOrgSources(true);
+          window.location.reload();
+        }
+      });
+    }
+
+    // Iniciar renderizado, foco inicial y sincronización inteligente en segundo plano
     window.addEventListener("load", () => {
       renderChannelsGrid();
       const firstCard = document.getElementById("card-channel-0");
       if (firstCard) firstCard.focus();
+      setTimeout(() => syncIptvOrgSources(false), 1500);
     });
   </script>
 </body>

@@ -3,94 +3,140 @@
     android:height="180dp"
     android:viewportWidth="320"
     android:viewportHeight="180">
-    
+
     <!-- Fondo del Banner -->
     <path
         android:fillColor="#090d16"
         android:pathData="M0,0h320v180h-320z"/>
 
-    <!-- Detalle decorativo superior -->
+    <!-- Franja decorativa superior amarilla Simpsons -->
     <path
-        android:fillColor="#0284c7"
+        android:fillColor="#facc15"
         android:pathData="M0,0h320v6h-320z"/>
 
     <!-- Resplandor circular de fondo -->
     <path
         android:fillColor="#1e293b"
-        android:pathData="M240,90m-60,0a60,60 0,1,1 120,0a60,60 0,1,1 -120,0"/>
+        android:pathData="M82,96m-64,0a64,64 0,1,1 128,0a64,64 0,1,1 -128,0"/>
 
-    <!-- Silueta de Televisor TV -->
+    <!-- ==================== TV DE LOS SIMPSONS ==================== -->
+    <!-- Antena izquierda -->
     <path
-        android:fillColor="#1e293b"
-        android:strokeColor="#38bdf8"
-        android:strokeWidth="4"
-        android:pathData="M35,42h85a10,10 0 0 1 10,10v65a10,10 0 0 1 -10,10h-85a10,10 0 0 1 -10,-10v-65a10,10 0 0 1 10,-10z"/>
-    
-    <!-- Pantalla del TV -->
-    <path
-        android:fillColor="#0284c7"
-        android:pathData="M42,50h68a4,4 0 0 1 4,4v50a4,4 0 0 1 -4,4h-68a4,4 0 0 1 -4,-4v-50a4,4 0 0 1 4,-4z"/>
-
-    <!-- Antenitas / Ondas de señal -->
-    <path
-        android:strokeColor="#facc15"
-        android:strokeWidth="3.5"
+        android:strokeColor="#e2e8f0"
+        android:strokeWidth="3.2"
         android:strokeLineCap="round"
-        android:pathData="M60,32L77,42L95,32"/>
-
-    <!-- Botones laterales del TV -->
+        android:strokeLineJoin="round"
+        android:pathData="M72,54 L63,54 L54,57 L43,44 L35,47"/>
     <path
         android:fillColor="#facc15"
-        android:pathData="M121,62m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
-    <path
-        android:fillColor="#10b981"
-        android:pathData="M121,76m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
+        android:pathData="M35,47m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
 
-    <!-- Base de la TV -->
+    <!-- Antena derecha -->
     <path
-        android:strokeColor="#64748b"
-        android:strokeWidth="4"
+        android:strokeColor="#e2e8f0"
+        android:strokeWidth="3.2"
         android:strokeLineCap="round"
-        android:pathData="M65,127L58,138M90,127L97,138"/>
+        android:strokeLineJoin="round"
+        android:pathData="M88,53 L95,41 L95,31 L104,22 L111,20 L114,14"/>
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M114,14m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
 
-    <!-- Texto decorativo: MI TELE -->
-    <!-- M -->
+    <!-- Domo gris de la antena -->
+    <path
+        android:fillColor="#8c8f94"
+        android:strokeColor="#231f20"
+        android:strokeWidth="3"
+        android:pathData="M65,57 C65,47 91,47 91,57 Z"/>
+
+    <!-- Patitas de madera -->
+    <path
+        android:fillColor="#4a3c16"
+        android:strokeColor="#231f20"
+        android:strokeWidth="2.5"
+        android:pathData="M34,132 L30,148 L37,148 L43,132 Z"/>
+    <path
+        android:fillColor="#4a3c16"
+        android:strokeColor="#231f20"
+        android:strokeWidth="2.5"
+        android:pathData="M122,132 L128,148 L135,148 L131,132 Z"/>
+
+    <!-- Gabinete exterior lila/lavanda -->
+    <path
+        android:fillColor="#8c9cd4"
+        android:strokeColor="#231f20"
+        android:strokeWidth="3.5"
+        android:pathData="M30,57 h105 a3,3 0 0 1 3,3 v69 a3,3 0 0 1 -3,3 h-105 a3,3 0 0 1 -3,-3 v-69 a3,3 0 0 1 3,-3 z"/>
+
+    <!-- Marco interno azul-violeta -->
+    <path
+        android:fillColor="#5965b3"
+        android:strokeColor="#231f20"
+        android:strokeWidth="2.5"
+        android:pathData="M35,63 h80 a2,2 0 0 1 2,2 v56 a2,2 0 0 1 -2,2 h-80 a2,2 0 0 1 -2,-2 v-56 a2,2 0 0 1 2,-2 z"/>
+
+    <!-- Pantalla CRT curva blanca -->
     <path
         android:fillColor="#ffffff"
-        android:pathData="M160,82L160,56L168,72L176,56L176,82L171,82L171,64L168,71L163,64L163,82Z"/>
-    <!-- I -->
+        android:strokeColor="#231f20"
+        android:strokeWidth="2.8"
+        android:pathData="M50,67 C66,64.5 85,64.5 101,67 C109,68.5 112,77 112,93 C112,109 109,117 101,118.5 C85,121 66,121 50,118.5 C42,117 39,109 39,93 C39,77 42,68.5 50,67 Z"/>
+
+    <!-- Perillas derechas -->
     <path
-        android:fillColor="#ffffff"
-        android:pathData="M183,82L183,56L189,56L189,82Z"/>
-    
-    <!-- TELE -->
+        android:fillColor="#5965b3"
+        android:strokeColor="#231f20"
+        android:strokeWidth="2.2"
+        android:pathData="M127,74m-5.5,0a5.5,5.5 0,1,1 11,0a5.5,5.5 0,1,1 -11,0"/>
+    <path
+        android:fillColor="#5965b3"
+        android:strokeColor="#231f20"
+        android:strokeWidth="2.2"
+        android:pathData="M127,90m-5.5,0a5.5,5.5 0,1,1 11,0a5.5,5.5 0,1,1 -11,0"/>
+
+    <!-- Parlante inferior derecho -->
+    <path
+        android:fillColor="#5965b3"
+        android:strokeColor="#231f20"
+        android:strokeWidth="2.2"
+        android:pathData="M122,102 h10 a1.5,1.5 0 0 1 1.5,1.5 v16 a1.5,1.5 0 0 1 -1.5,1.5 h-10 a1.5,1.5 0 0 1 -1.5,-1.5 v-16 a1.5,1.5 0 0 1 1.5,-1.5 z"/>
+
+    <!-- ==================== TEXTO: ANDY TV ==================== -->
+    <!-- A -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M162,90 L170,58 L178,58 L186,90 L180,90 L178.5,83 L169.5,83 L168,90 Z M171,78 L177,78 L174,65 Z"/>
+    <!-- N -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M191,90 L191,58 L197,58 L207,79 L207,58 L213,58 L213,90 L207,90 L197,69 L197,90 Z"/>
+    <!-- D -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M219,90 L219,58 L230,58 C238,58 242,64 242,74 C242,84 238,90 230,90 Z M225,84 L229,84 C234,84 236,80 236,74 C236,68 234,64 229,64 L225,64 Z"/>
+    <!-- Y -->
+    <path
+        android:fillColor="#facc15"
+        android:pathData="M253,90 L253,77 L244,58 L251,58 L256,70 L261,58 L268,58 L259,77 L259,90 Z"/>
+
     <!-- T -->
     <path
-        android:fillColor="#facc15"
-        android:pathData="M200,56L214,56L214,61L209,61L209,82L205,82L205,61L200,61Z"/>
-    <!-- E -->
+        android:fillColor="#ffffff"
+        android:pathData="M274,58 L294,58 L294,64 L287,64 L287,90 L281,90 L281,64 L274,64 Z"/>
+    <!-- V -->
     <path
-        android:fillColor="#facc15"
-        android:pathData="M217,82L217,56L229,56L229,61L222,61L222,66L228,66L228,71L222,71L222,77L229,77L229,82Z"/>
-    <!-- L -->
-    <path
-        android:fillColor="#facc15"
-        android:pathData="M233,82L233,56L238,56L238,77L245,77L245,82Z"/>
-    <!-- E -->
-    <path
-        android:fillColor="#facc15"
-        android:pathData="M249,82L249,56L261,56L261,61L254,61L254,66L260,66L260,71L254,71L254,77L261,77L261,82Z"/>
+        android:fillColor="#ffffff"
+        android:pathData="M296,58 L302,58 L307,81 L312,58 L318,58 L310,90 L304,90 Z"/>
 
     <!-- Badge TV EN VIVO -->
     <path
-        android:fillColor="#0284c7"
-        android:strokeColor="#38bdf8"
-        android:strokeWidth="1.5"
-        android:pathData="M160,98h105a8,8 0 0 1 8,8v12a8,8 0 0 1 -8,8h-105a8,8 0 0 1 -8,-8v-12a8,8 0 0 1 8,-8z"/>
+        android:fillColor="#5965b3"
+        android:strokeColor="#8c9cd4"
+        android:strokeWidth="2"
+        android:pathData="M168,104h126a8,8 0 0 1 8,8v14a8,8 0 0 1 -8,8h-126a8,8 0 0 1 -8,-8v-14a8,8 0 0 1 8,-8z"/>
 
     <!-- Punto rojo EN VIVO -->
     <path
         android:fillColor="#ef4444"
-        android:pathData="M172,112m-4,0a4,4 0,1,1 8,0a4,4 0,1,1 -8,0"/>
-
+        android:pathData="M182,119m-5,0a5,5 0,1,1 10,0a5,5 0,1,1 -10,0"/>
 </vector>
