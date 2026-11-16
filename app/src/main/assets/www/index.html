@@ -823,13 +823,14 @@
       color: #fff;
     }
 
-    /* Barra lateral vertical de canales (Estilo DGO / DirecTV GO) */
+    /* Barra lateral vertical de canales (Estilo DGO / DirecTV GO - acortada para no pisar la barra OSD) */
     .overlay-middle {
       position: absolute;
-      top: 80px;
-      bottom: 24px;
-      left: 36px;
+      top: 76px;
+      bottom: 134px;
+      left: 32px;
       width: 250px;
+      max-height: calc(100vh - 220px);
       display: flex;
       flex-direction: column;
       pointer-events: auto;
@@ -1673,7 +1674,7 @@
       overlayTimeout = setTimeout(() => {
         playerOverlay.classList.add("hidden");
         if (playerOsdBottom) playerOsdBottom.classList.add("hidden");
-      }, 5500);
+      }, 10000);
     }
 
     function toggleOverlay() {
