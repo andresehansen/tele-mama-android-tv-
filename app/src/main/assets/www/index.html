@@ -224,7 +224,7 @@
       outline: none;
       transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
-      min-height: 140px;
+      min-height: 155px;
       min-width: 0;
       max-width: 100%;
       box-sizing: border-box;
@@ -355,47 +355,52 @@
     .card-canal26 { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 55%, #1e3a8a 100%); }
     .card-fifaplus { background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 55%, #eab308 100%); }
 
-    /* Guía EPG en las tarjetas de la pantalla de inicio */
+    /* Guía EPG en las tarjetas de la pantalla de inicio (Tipografía grande legible para TV) */
     .channel-epg-preview {
-      margin-top: 8px;
-      font-size: 0.84rem;
+      margin-top: 10px;
+      font-size: 0.96rem;
       color: #e2e8f0;
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 4px;
       text-align: left;
       width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.55);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
     .channel-epg-preview .epg-now {
-      font-weight: 700;
+      font-size: 1.14rem;
+      font-weight: 900;
       color: #facc15;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      line-height: 1.25;
     }
     .channel-epg-preview .epg-live-dot {
       color: #ef4444;
-      font-size: 0.9rem;
+      font-size: 1.25rem;
       line-height: 1;
     }
     .channel-epg-preview .epg-next {
-      font-size: 0.76rem;
-      color: #94a3b8;
+      font-size: 0.92rem;
+      color: #cbd5e1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.2;
     }
     .channel-epg-preview .epg-time {
-      color: #cbd5e1;
-      font-weight: normal;
-      font-size: 0.78rem;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.96rem;
+      margin-left: 2px;
     }
 
     /* Barra OSD Inferior con EPG en vivo en el Reproductor */
@@ -2535,8 +2540,15 @@
             return;
           }
 
-          // Botones laterales del control remoto (Izquierda / Derecha):
-          // Acceden directamente a la barra superior de acciones (Favorito, Señal, etc.)
+          // Flecha Arriba (▲) o Flecha Izquierda (◄): acceso directo instantáneo a los botones superiores (Inicio / Último / Señal)
+          if (e.key === "ArrowUp" || e.key === "ArrowLeft" || e.keyCode === 37) {
+            e.preventDefault();
+            resetOverlayTimer();
+            if (topBtns.length > 0) topBtns[0].focus();
+            return;
+          }
+
+          // Flecha Derecha (►): acceso directo al botón de Favoritos
           if (e.key === "ArrowRight" || e.keyCode === 39) {
             e.preventDefault();
             resetOverlayTimer();
@@ -2544,15 +2556,9 @@
             if (target) target.focus();
             return;
           }
-          if (e.key === "ArrowLeft" || e.keyCode === 37) {
-            e.preventDefault();
-            resetOverlayTimer();
-            if (topBtns[0]) topBtns[0].focus();
-            return;
-          }
 
-          // Flecha Arriba, Flecha Abajo o Enter/OK: abren la guía lateral de canales
-          if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Enter" || e.keyCode === 13) {
+          // Flecha Abajo o Enter/OK: abre la guía lateral de canales
+          if (e.key === "ArrowDown" || e.key === "Enter" || e.keyCode === 13) {
             e.preventDefault();
             resetOverlayTimer();
             const activeBarBtn = sideBtns[currentIndex] || sideBtns[0];
@@ -2588,7 +2594,7 @@
                   activeBarBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
                 }
               } else if (e.key === "ArrowDown") {
-                // Flecha Abajo: vuelve a la guía lateral de canales en el canal actual
+                // Flecha Abajo: baja a la guía lateral de canales en el canal actual
                 if (sideBtns.length > 0) {
                   const activeBarBtn = sideBtns[currentIndex] || sideBtns[0];
                   activeBarBtn.focus();
@@ -2605,20 +2611,22 @@
                   sideBtns[sIdx + 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
                 }
               } else if (e.key === "ArrowUp") {
-                // Sube al canal anterior de la guía (sin saltar a la barra superior para evitar cambiar de canal sin querer)
+                // Sube al canal anterior. Si ya está en el primer canal visible o canal 1: ¡SALTA DIRECTO A LOS BOTONES SUPERIORES!
                 if (sIdx - 1 >= 0) {
                   sideBtns[sIdx - 1].focus();
                   sideBtns[sIdx - 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
+                } else if (topBtns.length > 0) {
+                  topBtns[0].focus();
                 }
-              } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-                // BOTÓN LATERAL: Salta directamente a los botones superiores
+              } else if (e.key === "ArrowRight") {
+                // FLECHA DERECHA DESDE CUALQUIER CANAL: Salta inmediatamente a la barra superior (⬅ Inicio)
                 if (topBtns.length > 0) {
-                  if (e.key === "ArrowRight") {
-                    const favBtn = btnToggleFav && btnToggleFav.style.display !== "none" ? btnToggleFav : topBtns[topBtns.length - 1];
-                    favBtn.focus();
-                  } else {
-                    topBtns[0].focus();
-                  }
+                  topBtns[0].focus();
+                }
+              } else if (e.key === "ArrowLeft") {
+                // Flecha Izquierda: enfoca el botón de Inicio
+                if (topBtns.length > 0) {
+                  topBtns[0].focus();
                 }
               }
             } 
@@ -2878,15 +2886,15 @@
       await loadChannels(false);
       renderChannelsGrid();
       renderChannelBar();
+      // Siempre iniciar en el menú inicial (pantalla de inicio con toda la grilla de canales)
+      viewHome.style.display = "flex";
+      viewPlayer.style.display = "none";
       const lastId = getLastWatchedChannelId();
       const lastIdx = lastId ? CHANNELS.findIndex(c => c.id === lastId) : -1;
-      if (lastIdx >= 0) {
-        // Retomar el último canal al abrir la app como un televisor real
-        openChannel(lastIdx);
-      } else {
-        const targetCard = document.getElementById("card-channel-0") || channelCardsElements[0];
-        if (targetCard) targetCard.focus();
-      }
+      const targetCard = (lastIdx >= 0 && document.getElementById(`card-channel-${lastIdx}`))
+        || document.getElementById("card-channel-0")
+        || channelCardsElements[0];
+      if (targetCard) targetCard.focus();
       loadSavedCustomM3uSilently();
       setTimeout(() => syncIptvOrgSources(false), 1500);
     }
