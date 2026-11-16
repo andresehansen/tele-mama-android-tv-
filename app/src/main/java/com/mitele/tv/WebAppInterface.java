@@ -22,12 +22,27 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void playNativeHls(String url) {
-        activity.playNativeHls(url);
+        activity.playNativeHlsWithHeaders(url, null);
+    }
+
+    @JavascriptInterface
+    public void playNativeHlsWithHeaders(String url, String headersJson) {
+        activity.playNativeHlsWithHeaders(url, headersJson);
     }
 
     @JavascriptInterface
     public void stopNativeHls() {
         activity.stopNativeHls();
+    }
+
+    @JavascriptInterface
+    public void setVideoAspectMode(String mode) {
+        activity.setVideoAspectMode(mode);
+    }
+
+    @JavascriptInterface
+    public void enterPiP() {
+        activity.enterPiPMode();
     }
 
     @JavascriptInterface
