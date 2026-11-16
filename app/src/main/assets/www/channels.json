@@ -1,0 +1,405 @@
+[
+  {
+    "id": "tn",
+    "number": 1,
+    "category": "noticias",
+    "name": "TN",
+    "subtitle": "Todo Noticias",
+    "themeClass": "card-tn",
+    "type": "hls",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "Artear Directo 1080p",
+        "type": "hls",
+        "url": "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8",
+        "useProxy": false
+      },
+      {
+        "label": "Artear vía Proxy IP",
+        "type": "hls",
+        "url": "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8",
+        "useProxy": true
+      }
+    ],
+    "hlsUrl": "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8",
+    "useProxy": false,
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0b2545\"/>\n            <path d=\"M15 15 L85 15 L60 85 L15 85 Z\" fill=\"#e65c00\" opacity=\"0.35\"/>\n            <text x=\"50\" y=\"65\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"44\" fill=\"#ffffff\" text-anchor=\"middle\">TN</text>\n          </svg>\n        "
+  },
+  {
+    "id": "telefe",
+    "number": 2,
+    "category": "aire",
+    "name": "Telefe",
+    "subtitle": "Canal 11",
+    "themeClass": "card-telefe",
+    "type": "telefe-token",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "Telefe Oficial 1080p (Señal Verificada)",
+        "type": "telefe-token",
+        "streamId": "6a024684fd4ca6a938f3a118"
+      },
+      {
+        "label": "Telefe Respaldo 1080p (IPTV Directo)",
+        "type": "hls",
+        "url": "http://45.173.231.22:8000/play/a053/index.m3u8",
+        "useProxy": true
+      }
+    ],
+    "hlsUrl": "http://45.173.231.22:8000/play/a053/index.m3u8",
+    "tokenApiUrl": "https://57j4mtvcjjf7siqnnvkixb5d3i0uvjei.lambda-url.us-east-1.on.aws/?stream_id=6a024684fd4ca6a938f3a118",
+    "streamId": "6a024684fd4ca6a938f3a118",
+    "playerId": "69f8d6e334a190b16647b23b",
+    "useProxy": false,
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <circle cx=\"28\" cy=\"50\" r=\"18\" fill=\"#2563eb\" />\n            <circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"#16a34a\" />\n            <circle cx=\"72\" cy=\"50\" r=\"18\" fill=\"#dc2626\" />\n            <text x=\"50\" y=\"86\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"16\" fill=\"#ffffff\" text-anchor=\"middle\">telefe</text>\n          </svg>\n        "
+  },
+  {
+    "id": "c5n",
+    "number": 3,
+    "category": "noticias",
+    "name": "C5N",
+    "subtitle": "Noticias 24hs",
+    "themeClass": "card-c5n",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "C5N Noticias 24hs Oficial (c5n.com/vivo)",
+        "type": "youtube-live",
+        "ytVideoId": "rZtTUCxpPuI",
+        "ytLivePageUrl": "https://www.c5n.com/vivo"
+      },
+      {
+        "label": "C5N Señal Directa 24hs (YouTube)",
+        "type": "youtube-live",
+        "ytVideoId": "rZtTUCxpPuI",
+        "ytLivePageUrl": "https://www.c5n.com/vivo"
+      }
+    ],
+    "ytVideoId": "rZtTUCxpPuI",
+    "ytLivePageUrl": "https://www.c5n.com/vivo",
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#991b1b\"/>\n            <text x=\"50\" y=\"66\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"36\" fill=\"#ffffff\" text-anchor=\"middle\">C5N</text>\n          </svg>\n        "
+  },
+  {
+    "id": "eltrece",
+    "number": 4,
+    "category": "aire",
+    "name": "El Trece",
+    "subtitle": "Canal 13",
+    "themeClass": "card-eltrece",
+    "type": "hls",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "VodGC Directo 1080p (eltrecetv.com.ar)",
+        "type": "hls",
+        "url": "https://livetrx01.vodgc.net/eltrecetv/index.m3u8",
+        "useProxy": false
+      },
+      {
+        "label": "Reproductor Web Oficial El Trece",
+        "type": "embed",
+        "url": "https://api.vodgc.net/player/v2/embed/playerId/PRZ9KU1515679151/contentId/1427089"
+      }
+    ],
+    "hlsUrl": "https://livetrx01.vodgc.net/eltrecetv/index.m3u8",
+    "useProxy": false,
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <circle cx=\"50\" cy=\"50\" r=\"42\" fill=\"#581c87\"/>\n            <circle cx=\"50\" cy=\"50\" r=\"28\" fill=\"#ea580c\"/>\n            <circle cx=\"50\" cy=\"50\" r=\"15\" fill=\"#facc15\"/>\n            <text x=\"50\" y=\"88\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"13\" fill=\"#ffffff\" text-anchor=\"middle\">el trece</text>\n          </svg>\n        "
+  },
+  {
+    "id": "elnueve",
+    "number": 5,
+    "category": "aire",
+    "name": "El Nueve",
+    "subtitle": "Canal 9",
+    "themeClass": "card-elnueve",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "Web Oficial El Nueve (elnueve.com.ar/en-vivo)",
+        "type": "youtube-live",
+        "ytVideoId": "yGLVhAklLyM",
+        "ytLivePageUrl": "https://www.youtube.com/@elnueve/live"
+      },
+      {
+        "label": "El Nueve Canal Oficial (YouTube)",
+        "type": "youtube-live",
+        "ytVideoId": "yGLVhAklLyM",
+        "ytLivePageUrl": "https://www.youtube.com/elnueve/live"
+      }
+    ],
+    "ytVideoId": "yGLVhAklLyM",
+    "ytLivePageUrl": "https://www.youtube.com/@elnueve/live",
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#9d174d\"/>\n            <circle cx=\"50\" cy=\"44\" r=\"28\" fill=\"#f43f5e\"/>\n            <text x=\"50\" y=\"59\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"44\" fill=\"#ffffff\" text-anchor=\"middle\">9</text>\n            <text x=\"50\" y=\"88\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"12\" fill=\"#ffffff\" text-anchor=\"middle\">EL NUEVE</text>\n          </svg>\n        "
+  },
+  {
+    "id": "americatv",
+    "number": 6,
+    "category": "aire",
+    "name": "América TV",
+    "subtitle": "Canal 2",
+    "themeClass": "card-americatv",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Live Oficial (americatv.com.ar)",
+        "type": "youtube-live",
+        "ytVideoId": "ICgWhNv7X2Q",
+        "ytLivePageUrl": "https://www.youtube.com/user/americatv/live"
+      },
+      {
+        "label": "Web Oficial América TV (Google DAI HD)",
+        "type": "hls",
+        "url": "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
+        "useProxy": false,
+        "preferNativeAndroid": true
+      },
+      {
+        "label": "Señal Directa 720p (ExoPlayer TV)",
+        "type": "hls",
+        "url": "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8",
+        "useProxy": false,
+        "preferNativeAndroid": true,
+        "headers": {
+          "User-Agent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, como Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
+          "Referer": "https://vmf.edge-apps.net/"
+        }
+      },
+      {
+        "label": "Reproductor Web Oficial América TV",
+        "type": "embed",
+        "url": "https://vmf.edge-apps.net/embed/live.php?streamname=americahls-100056&autoplay=true"
+      }
+    ],
+    "hlsUrl": "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
+    "ytVideoId": "ICgWhNv7X2Q",
+    "ytLivePageUrl": "https://www.youtube.com/user/americatv/live",
+    "useProxy": false,
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0284c7\"/>\n            <polygon points=\"50,18 82,80 18,80\" fill=\"#ea580c\"/>\n            <circle cx=\"50\" cy=\"54\" r=\"16\" fill=\"#facc15\"/>\n            <text x=\"50\" y=\"93\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"12\" fill=\"#ffffff\" text-anchor=\"middle\">AMÉRICA</text>\n          </svg>\n        "
+  },
+  {
+    "id": "a24",
+    "number": 7,
+    "category": "noticias",
+    "name": "A24",
+    "subtitle": "América 24",
+    "themeClass": "card-a24",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Live Oficial (a24.com/vivo)",
+        "type": "youtube-live",
+        "ytVideoId": "ArKbAx1K-2U",
+        "ytLivePageUrl": "https://www.youtube.com/@A24com/live"
+      },
+      {
+        "label": "Web Oficial A24 (HLS 720p)",
+        "type": "hls",
+        "url": "http://g2.vxral-slo.transport.edge-access.net/a15/ngrp:a24-100056_all/Playlist.m3u8?sense=true",
+        "useProxy": false,
+        "preferNativeAndroid": true,
+        "headers": {
+          "Referer": "https://vmf.edge-apps.net/"
+        }
+      },
+      {
+        "label": "Reproductor Web Oficial A24",
+        "type": "embed",
+        "url": "https://vmf.edge-apps.net/embed/live.php?streamname=a24-100056&autoplay=true"
+      }
+    ],
+    "hlsUrl": "http://g2.vxral-slo.transport.edge-access.net/a15/ngrp:a24-100056_all/Playlist.m3u8?sense=true",
+    "ytVideoId": "ArKbAx1K-2U",
+    "ytLivePageUrl": "https://www.youtube.com/@A24com/live",
+    "useProxy": false,
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#1e3a8a\"/>\n            <path d=\"M15 80 L35 24 L52 24 L70 80 L52 80 L47 62 L32 62 L27 80 Z\" fill=\"#dc2626\"/>\n            <text x=\"73\" y=\"74\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"34\" fill=\"#ffffff\" text-anchor=\"middle\">24</text>\n          </svg>\n        "
+  },
+  {
+    "id": "tvpublica",
+    "number": 8,
+    "category": "aire",
+    "name": "TV Pública",
+    "subtitle": "Canal 7",
+    "themeClass": "card-tvpublica",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Live Oficial (canal7.com.ar)",
+        "type": "youtube-live",
+        "ytVideoId": "4snv3lXhzOw",
+        "ytLivePageUrl": "https://www.youtube.com/channel/UCs231K71Bnu5295_x0MB5Pg/live"
+      },
+      {
+        "label": "Web Oficial Canal 7 (HLS 720p)",
+        "type": "hls",
+        "url": "https://g5.mc-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8",
+        "useProxy": false,
+        "preferNativeAndroid": true,
+        "headers": {
+          "Referer": "https://vmf.edge-apps.net/"
+        }
+      },
+      {
+        "label": "Edge-Access Secundario",
+        "type": "hls",
+        "url": "https://g5.vxral-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8",
+        "useProxy": false,
+        "preferNativeAndroid": true
+      },
+      {
+        "label": "Reproductor Web Oficial TV Pública",
+        "type": "embed",
+        "url": "https://vmf.edge-apps.net/embed/live.php?streamname=c7live01-20034&autoplay=true"
+      }
+    ],
+    "hlsUrl": "https://g5.mc-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8",
+    "ytVideoId": "4snv3lXhzOw",
+    "ytLivePageUrl": "https://www.youtube.com/channel/UCs231K71Bnu5295_x0MB5Pg/live",
+    "useProxy": false,
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0369a1\"/>\n            <rect x=\"0\" y=\"35\" width=\"100\" height=\"30\" fill=\"#ffffff\"/>\n            <circle cx=\"50\" cy=\"50\" r=\"11\" fill=\"#f59e0b\"/>\n            <text x=\"50\" y=\"88\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"12\" fill=\"#ffffff\" text-anchor=\"middle\">TV PÚBLICA</text>\n          </svg>\n        "
+  },
+  {
+    "id": "lnmas",
+    "number": 9,
+    "category": "noticias",
+    "name": "LN+",
+    "subtitle": "La Nación +",
+    "themeClass": "card-lnmas",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Live Oficial",
+        "type": "youtube-live",
+        "ytVideoId": "FEWZjXJ7M0c",
+        "ytLivePageUrl": "https://www.youtube.com/@lanacion/live"
+      }
+    ],
+    "ytVideoId": "FEWZjXJ7M0c",
+    "ytLivePageUrl": "https://www.youtube.com/@lanacion/live",
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#091e3a\"/>\n            <text x=\"36\" y=\"66\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"#ffffff\" text-anchor=\"middle\">LN</text>\n            <text x=\"76\" y=\"66\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"48\" fill=\"#38bdf8\" text-anchor=\"middle\">+</text>\n          </svg>\n        "
+  },
+  {
+    "id": "cronica",
+    "number": 10,
+    "category": "noticias",
+    "name": "Crónica",
+    "subtitle": "Firme junto al pueblo",
+    "themeClass": "card-cronica",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Live Oficial",
+        "type": "youtube-live",
+        "ytVideoId": "hw4uHyct4vg",
+        "ytLivePageUrl": "https://www.youtube.com/@cronicatv/live"
+      }
+    ],
+    "ytVideoId": "hw4uHyct4vg",
+    "ytLivePageUrl": "https://www.youtube.com/@cronicatv/live",
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#dc2626\"/>\n            <rect x=\"8\" y=\"24\" width=\"84\" height=\"42\" rx=\"10\" fill=\"#ffffff\"/>\n            <text x=\"50\" y=\"55\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"18\" fill=\"#dc2626\" text-anchor=\"middle\">CRONICA</text>\n            <text x=\"50\" y=\"86\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"13\" fill=\"#facc15\" text-anchor=\"middle\">EN VIVO</text>\n          </svg>\n        "
+  },
+  {
+    "id": "canalrural",
+    "number": 11,
+    "category": "aire",
+    "name": "Canal Rural",
+    "subtitle": "El campo en vivo",
+    "themeClass": "card-canalrural",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Live Oficial",
+        "type": "youtube-live",
+        "ytVideoId": "w78Zr0J-dIs",
+        "ytLivePageUrl": "https://www.youtube.com/@canalrural/live"
+      }
+    ],
+    "ytVideoId": "w78Zr0J-dIs",
+    "ytLivePageUrl": "https://www.youtube.com/@canalrural/live",
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#14532d\"/>\n            <path d=\"M50 20 C65 35 65 65 50 80 C35 65 35 35 50 20 Z\" fill=\"#84cc16\"/>\n            <text x=\"50\" y=\"88\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"12\" fill=\"#ffffff\" text-anchor=\"middle\">RURAL</text>\n          </svg>\n        "
+  },
+  {
+    "id": "tycsports",
+    "number": 12,
+    "category": "deportes",
+    "name": "TyC Sports",
+    "subtitle": "Argentina / Internacional",
+    "themeClass": "card-tycsports",
+    "type": "hls",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "VodGC Oficial 1080p (AR)",
+        "type": "hls",
+        "url": "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8",
+        "useProxy": false
+      },
+      {
+        "label": "Amagi Global 1080p (Int/USA)",
+        "type": "hls",
+        "url": "https://amg26268-amg26268c14-freelivesports-emea-10267.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg26268-sportsstudio-tycsports-freelivesportsemea/playlist.m3u8",
+        "useProxy": false
+      }
+    ],
+    "hlsUrl": "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8",
+    "useProxy": false,
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0c4a6e\"/>\n            <text x=\"50\" y=\"54\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"32\" fill=\"#ffffff\" text-anchor=\"middle\">TyC</text>\n            <text x=\"50\" y=\"80\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"15\" fill=\"#38bdf8\" text-anchor=\"middle\">SPORTS</text>\n          </svg>\n        "
+  },
+  {
+    "id": "canal26",
+    "number": 13,
+    "category": "noticias",
+    "name": "Canal 26",
+    "subtitle": "Noticias en Vivo",
+    "themeClass": "card-canal26",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Oficial 24/7",
+        "type": "youtube-live",
+        "ytVideoId": "w_Ma8oQLmSM",
+        "ytLivePageUrl": "https://www.youtube.com/@canal26/live"
+      }
+    ],
+    "ytVideoId": "w_Ma8oQLmSM",
+    "ytLivePageUrl": "https://www.youtube.com/@canal26/live",
+    "logoSvg": "<svg viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#dc2626\"/><text x=\"50\" y=\"66\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"44\" fill=\"#ffffff\" text-anchor=\"middle\">26</text></svg>"
+  },
+  {
+    "id": "fifaplus",
+    "number": 14,
+    "category": "deportes",
+    "name": "FIFA+",
+    "subtitle": "Fútbol y Archivo Oficial",
+    "themeClass": "card-fifaplus",
+    "type": "hls",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "FIFA+ Fast TV (Español)",
+        "type": "hls",
+        "url": "https://6c849fb3.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctbXhfRklGQVBsdXNTcGFuaXNoLTFfSExT/playlist.m3u8",
+        "useProxy": false
+      },
+      {
+        "label": "FIFA+ Global (Inglés)",
+        "type": "hls",
+        "url": "https://a62dad94.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0ZJRkFQbHVzRW5nbGlzaF9ITFM/playlist.m3u8",
+        "useProxy": false
+      }
+    ],
+    "hlsUrl": "https://6c849fb3.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctbXhfRklGQVBsdXNTcGFuaXNoLTFfSExT/playlist.m3u8",
+    "useProxy": false,
+    "logoSvg": "<svg viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0284c7\"/><text x=\"50\" y=\"55\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"28\" fill=\"#ffffff\" text-anchor=\"middle\">FIFA</text><text x=\"50\" y=\"80\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"26\" fill=\"#facc15\" text-anchor=\"middle\">+</text></svg>"
+  }
+]

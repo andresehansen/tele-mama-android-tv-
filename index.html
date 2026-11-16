@@ -10,7 +10,16 @@
   <link rel="icon" type="image/svg+xml" href="icon.svg">
 
   <!-- Hls.js para reproducción directa de streams HLS -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
+  <!-- Hls.js local con fallback a CDN jsDelivr -->
+  <script src="hls.min.js"></script>
+  <script>
+    if (typeof Hls === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"><\/script>');
+    }
+  </script>
+  <!-- Canales de televisión y Guía EPG por defecto -->
+  <script src="channels.js"></script>
+  <script src="epg.js"></script>
 
   <style>
     * {
@@ -281,10 +290,165 @@
     .card-tycsportslatam { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #60a5fa 100%); }
     .card-tycsportsusa { background: linear-gradient(135deg, #172554 0%, #1e40af 55%, #ef4444 100%); }
     .card-tntsports { background: linear-gradient(135deg, #3b0764 0%, #701a75 55%, #f43f5e 100%); }
-    .card-andysports {
-      background: linear-gradient(135deg, #064e3b 0%, #0f766e 45%, #ca8a04 100%);
-      border: 3px solid rgba(250, 204, 21, 0.45);
+    .card-canal26 { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 55%, #1e3a8a 100%); }
+    .card-fifaplus { background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 55%, #eab308 100%); }
+
+    /* Guía EPG en las tarjetas de la pantalla de inicio */
+    .channel-epg-preview {
+      margin-top: 8px;
+      font-size: 0.84rem;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      text-align: left;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
+    .channel-epg-preview .epg-now {
+      font-weight: 700;
+      color: #facc15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .channel-epg-preview .epg-live-dot {
+      color: #ef4444;
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+    .channel-epg-preview .epg-next {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .channel-epg-preview .epg-time {
+      color: #cbd5e1;
+      font-weight: normal;
+      font-size: 0.78rem;
+    }
+
+    /* Barra OSD Inferior con EPG en vivo en el Reproductor */
+    .player-osd-bottom {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 64px);
+      max-width: 1100px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(2, 6, 23, 0.98) 100%);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 18px;
+      padding: 12px 22px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      pointer-events: auto;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 20;
+    }
+    .player-osd-bottom.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(24px);
+      pointer-events: none;
+    }
+    .osd-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .osd-channel-badge {
+      background: #facc15;
+      color: #000;
+      font-size: 1.6rem;
+      font-weight: 900;
+      min-width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+    .osd-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+    .osd-row-top {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      min-width: 0;
+    }
+    .osd-channel-name {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+    .osd-program-now {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #38bdf8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .osd-program-time {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-left: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .osd-progress-track {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .osd-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #facc15);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .osd-row-bottom {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+    }
+    .osd-prog-next-label {
+      color: #64748b;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .osd-prog-next {
+      font-weight: 700;
+      color: #e2e8f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
 
     .channel-card .fav-star-badge {
       position: absolute;
@@ -306,90 +470,6 @@
       border-radius: 6px;
       border: 1px solid rgba(255,255,255,0.35);
       text-transform: uppercase;
-    }
-
-    /* Panel interactivo exclusivo de AndySports (100% en 1 sola pantalla sin scroll) */
-    .sports-signals-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 12px;
-      width: 100%;
-      margin-bottom: 10px;
-      text-align: left;
-    }
-
-    .sports-events-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 12px;
-      width: 100%;
-      flex: 1;
-      min-height: 0;
-      margin-bottom: 8px;
-      text-align: left;
-    }
-
-    .sports-hub-item {
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 41, 59, 0.92) 100%);
-      border: 3px solid rgba(56, 189, 248, 0.35);
-      border-radius: 16px;
-      padding: 10px 14px;
-      color: #ffffff;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 4px;
-      outline: none;
-      overflow: hidden;
-      min-width: 0;
-      transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
-    }
-
-    .sports-hub-item:focus, .sports-hub-item:hover {
-      border-color: #facc15 !important;
-      background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-      transform: scale(1.04);
-      box-shadow: 0 0 22px rgba(250, 204, 21, 0.9), 0 10px 24px rgba(0, 0, 0, 0.85);
-      z-index: 5;
-    }
-
-    .sports-hub-item.active {
-      border-color: #22c55e;
-      background: linear-gradient(145deg, rgba(6, 78, 59, 0.88) 0%, rgba(15, 118, 110, 0.75) 100%);
-    }
-
-    .sports-hub-item .sh-tag {
-      font-size: 0.76rem;
-      font-weight: 900;
-      color: #facc15;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .sports-hub-item .sh-title {
-      font-size: 1.08rem;
-      font-weight: 900;
-      color: #ffffff;
-      line-height: 1.18;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .sports-hub-item .sh-sub {
-      font-size: 0.82rem;
-      color: #cbd5e1;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     /* Barra inferior con ayuda de teclas de control remoto */
@@ -639,13 +719,13 @@
 
     /* Estilos compactos específicos para los botones superiores en TV */
     .overlay-top .btn-tv-control {
-      font-size: 1.05rem;
+      font-size: 0.98rem;
       font-weight: 800;
-      padding: 7px 16px;
+      padding: 6px 14px;
       border-radius: 9999px;
-      gap: 8px;
+      gap: 6px;
       border: 2px solid rgba(255, 255, 255, 0.35);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -871,59 +951,12 @@
         <div class="hint-item"><span class="key-badge">◄ ▲ ▼ ►</span> Navegar</div>
         <div class="hint-item"><span class="key-badge">OK</span> Sintonizar</div>
         <div class="hint-item"><span class="key-badge">MANTENER OK / F</span> ⭐ Favorito</div>
-        <div class="hint-item"><span class="key-badge">1 - 12</span> Número directo</div>
+        <div class="hint-item"><span class="key-badge" id="hint-direct-numbers">1 - 12</span> Número directo</div>
         <div class="hint-item"><span class="key-badge">S / AMARILLO</span> Cambiar Señal</div>
       </div>
       <div id="sync-status-badge" style="color: #38bdf8; font-weight: 800;">🟢 Auto-Sync Activo</div>
     </footer>
   </main>
-
-  <!-- Modal interactivo exclusivo del canal final AndySports (100% en pantalla sin desplazamiento) -->
-  <div class="modal-backdrop" id="andysports-modal" style="background: rgba(4, 9, 20, 0.86); backdrop-filter: blur(8px); padding: 12px;">
-    <div class="modal-box" style="max-width: 96vw; width: 1440px; height: 92vh; padding: 16px 24px; background: rgba(15, 23, 42, 0.96); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
-      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 8px; flex-shrink: 0;">
-        <h2 style="margin: 0; font-size: 1.65rem; display: flex; align-items: center; gap: 10px;">
-          🏆 AndySports <span style="font-size: 1rem; color: #cbd5e1; font-weight: 700;">— Central Deportiva & Agenda en Vivo</span>
-        </h2>
-        <span id="andysports-agenda-status" style="color: #38bdf8; font-weight: 800; font-size: 0.95rem;">🔄 Sincronizando agenda...</span>
-      </div>
-
-      <!-- SECCIÓN 1: GRILLA FIJA DE 6 SEÑALES DEPORTIVAS EN 1 FILA (SIN SCROLL) -->
-      <div style="text-align: left; margin: 6px 0 4px 0; font-size: 0.95rem; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px; display: flex; justify-content: space-between; flex-shrink: 0;">
-        <span>📡 1. SEÑALES DEPORTIVAS EN VIVO (6 Señales Directas):</span>
-        <span style="color: #94a3b8; font-size: 0.85rem;">Navegue con ◄ ▲ ▼ ► y presione OK</span>
-      </div>
-      <div class="sports-signals-grid" id="andysports-hub-list" style="flex-shrink: 0;">
-        <!-- 6 Señales principales de AndySports -->
-      </div>
-
-      <!-- SECCIÓN 2: GRILLA FIJA DE 8 PARTIDOS (4x2) EN PANTALLA (SIN SCROLL) -->
-      <div style="text-align: left; margin: 2px 0 4px 0; font-size: 0.95rem; font-weight: 900; color: #facc15; letter-spacing: 0.5px; display: flex; justify-content: space-between; flex-shrink: 0;">
-        <span>📅 2. AGENDA DE EVENTOS Y PARTIDOS DESTACADOS DE HOY (En Vivo y Programados):</span>
-        <span style="color: #94a3b8; font-size: 0.85rem;">Presione OK sobre un partido para sintonizar</span>
-      </div>
-      <div class="sports-events-grid" id="andysports-events-list">
-        <!-- 8 Eventos deportivos principales en grilla 4x2 -->
-      </div>
-
-      <!-- PIE COMPACTO: BOTONES Y AYUDA DE CONTROL REMOTO -->
-      <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 2px solid rgba(255,255,255,0.1); flex-shrink: 0; gap: 12px;">
-        <div class="remote-hints" style="font-size: 0.9rem;">
-          <div class="hint-item"><span class="key-badge">◄ ▲ ▼ ►</span> Moverse</div>
-          <div class="hint-item"><span class="key-badge">OK</span> Sintonizar</div>
-          <div class="hint-item"><span class="key-badge">ATRÁS</span> Pantalla Completa</div>
-        </div>
-        <div style="display: flex; gap: 12px;">
-          <button class="btn-tv-control" id="btn-refresh-agenda" style="background: #0284c7; color: #fff; font-size: 1rem; padding: 7px 16px;" tabindex="0">
-            🔄 Actualizar Agenda
-          </button>
-          <button class="btn-tv-control" id="btn-close-andysports" style="background: #16a34a; color: #fff; font-size: 1rem; padding: 7px 18px;" tabindex="0">
-            ▶ Ver en Pantalla Completa
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Modal para configurar lista M3U propia o de proveedor -->
   <div class="modal-backdrop" id="m3u-modal">
@@ -998,13 +1031,16 @@
             <button class="btn-tv-control" id="btn-back" tabindex="0">
               ⬅ Inicio
             </button>
+            <button class="btn-tv-control" id="btn-recall" style="display: none; background: #334155; color: #f8fafc;" tabindex="0">
+              ↩ Último
+            </button>
             <button class="btn-tv-control" id="btn-switch-source" style="display: none; background: #0284c7; color: #ffffff;" tabindex="0">
               📡 Señal 1/2
             </button>
-            <button class="btn-tv-control" id="btn-aspect-ratio" style="background: #1e293b; color: #f8fafc;" tabindex="0" title="Cambiar relación de aspecto (Tecla Z)">
+            <button class="btn-tv-control" id="btn-aspect-ratio" style="background: #1e293b; color: #f8fafc;" tabindex="0">
               📐 Ajustar
             </button>
-            <button class="btn-tv-control" id="btn-toggle-fav" style="background: #1e293b; color: #facc15;" tabindex="0" title="Guardar o quitar de Favoritos (Tecla F)">
+            <button class="btn-tv-control" id="btn-toggle-fav" style="background: #1e293b; color: #facc15;" tabindex="0">
               ☆ Favorito
             </button>
             <button class="btn-tv-control" id="btn-skip-ad" style="display: none; background: #38bdf8; color: #000000;" tabindex="0">
@@ -1023,6 +1059,27 @@
           <span class="channel-menu-label">📺 Guía de Canales</span>
           <div class="channel-selector-bar" id="channel-selector-bar">
             <!-- Generado dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Barra OSD Inferior con EPG en vivo -->
+        <div class="player-osd-bottom" id="player-osd-bottom">
+          <div class="osd-main">
+            <div class="osd-channel-badge" id="osd-channel-num">1</div>
+            <div class="osd-details">
+              <div class="osd-row-top">
+                <span class="osd-channel-name" id="osd-channel-name">TN</span>
+                <span class="osd-program-now" id="osd-prog-title">TN Central</span>
+                <span class="osd-program-time" id="osd-prog-time">20:00 - 22:00</span>
+              </div>
+              <div class="osd-progress-track">
+                <div class="osd-progress-bar" id="osd-prog-progress" style="width: 45%;"></div>
+              </div>
+              <div class="osd-row-bottom">
+                <span class="osd-prog-next-label">A continuación:</span>
+                <span class="osd-prog-next" id="osd-prog-next">Solo Una Vuelta Más (22:00)</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1070,382 +1127,43 @@
     }
 
     /* ==========================================================================
-       3. FUENTES OFICIALES CURADAS PARA LOS 11 CANALES
+       3. GESTOR MODULAR DE CANALES (channels.json)
        ========================================================================== */
-    const CHANNELS = [
-      // --- AIRE Y NOTICIAS ---
-      {
-        id: "tn",
-        number: 1,
-        category: "noticias",
-        name: "TN",
-        subtitle: "Todo Noticias",
-        themeClass: "card-tn",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Artear Directo 1080p", type: "hls", url: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8", useProxy: false },
-          { label: "Artear vía Proxy IP", type: "hls", url: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8", useProxy: true }
-        ],
-        hlsUrl: "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8",
-        useProxy: false,
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#0b2545"/>
-            <path d="M15 15 L85 15 L60 85 L15 85 Z" fill="#e65c00" opacity="0.35"/>
-            <text x="50" y="65" font-family="sans-serif" font-weight="900" font-size="44" fill="#ffffff" text-anchor="middle">TN</text>
-          </svg>
-        `
-      },
-      // CANAL 2: TELEFE — SEÑAL 1080P VERIFICADA (CANAL 11 SALTA / TELEFE) + TOKEN MEDIASTREAM + EMBED OFICIAL
-      {
-        id: "telefe",
-        number: 2,
-        category: "aire",
-        name: "Telefe",
-        subtitle: "Canal 11",
-        themeClass: "card-telefe",
-        type: "telefe-token",
-        currentSourceIndex: 0,
-        sources: [
-          {
-            label: "Telefe Oficial 1080p (Señal Verificada)",
-            type: "telefe-token",
-            streamId: "6a024684fd4ca6a938f3a118"
-          },
-          {
-            label: "Telefe Respaldo 1080p (IPTV Directo)",
-            type: "hls",
-            url: "http://45.173.231.22:8000/play/a053/index.m3u8",
-            useProxy: true
+    let CHANNELS = (Array.isArray(window.DEFAULT_CHANNELS) && window.DEFAULT_CHANNELS.length > 0)
+      ? JSON.parse(JSON.stringify(window.DEFAULT_CHANNELS))
+      : [];
+
+    async function loadChannels(forceRemote = false) {
+      try {
+        const cacheKey = 'andytv_channels_cache';
+        if (!CHANNELS || CHANNELS.length === 0) {
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            try {
+              CHANNELS = JSON.parse(cached);
+              renderChannelsGrid();
+              renderChannelBar();
+            } catch (e) {}
           }
-        ],
-        hlsUrl: "http://45.173.231.22:8000/play/a053/index.m3u8",
-        tokenApiUrl: "https://57j4mtvcjjf7siqnnvkixb5d3i0uvjei.lambda-url.us-east-1.on.aws/?stream_id=6a024684fd4ca6a938f3a118",
-        streamId: "6a024684fd4ca6a938f3a118",
-        playerId: "69f8d6e334a190b16647b23b",
-        useProxy: false,
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <circle cx="28" cy="50" r="18" fill="#2563eb" />
-            <circle cx="50" cy="50" r="18" fill="#16a34a" />
-            <circle cx="72" cy="50" r="18" fill="#dc2626" />
-            <text x="50" y="86" font-family="sans-serif" font-weight="800" font-size="16" fill="#ffffff" text-anchor="middle">telefe</text>
-          </svg>
-        `
-      },
-      {
-        id: "c5n",
-        number: 3,
-        category: "noticias",
-        name: "C5N",
-        subtitle: "Noticias 24hs",
-        themeClass: "card-c5n",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "C5N Noticias 24hs Oficial (c5n.com/vivo)", type: "youtube-live", ytVideoId: "rZtTUCxpPuI", ytLivePageUrl: "https://www.c5n.com/vivo" },
-          { label: "C5N Señal Directa 24hs (YouTube)", type: "youtube-live", ytVideoId: "rZtTUCxpPuI", ytLivePageUrl: "https://www.c5n.com/vivo" }
-        ],
-        ytVideoId: "rZtTUCxpPuI",
-        ytLivePageUrl: "https://www.c5n.com/vivo",
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#991b1b"/>
-            <text x="50" y="66" font-family="sans-serif" font-weight="900" font-size="36" fill="#ffffff" text-anchor="middle">C5N</text>
-          </svg>
-        `
-      },
-      {
-        id: "eltrece",
-        number: 4,
-        category: "aire",
-        name: "El Trece",
-        subtitle: "Canal 13",
-        themeClass: "card-eltrece",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "VodGC Directo 1080p (eltrecetv.com.ar)", type: "hls", url: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8", useProxy: false },
-          { label: "Reproductor Web Oficial El Trece", type: "embed", url: "https://api.vodgc.net/player/v2/embed/playerId/PRZ9KU1515679151/contentId/1427089" }
-        ],
-        hlsUrl: "https://livetrx01.vodgc.net/eltrecetv/index.m3u8",
-        useProxy: false,
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="42" fill="#581c87"/>
-            <circle cx="50" cy="50" r="28" fill="#ea580c"/>
-            <circle cx="50" cy="50" r="15" fill="#facc15"/>
-            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="13" fill="#ffffff" text-anchor="middle">el trece</text>
-          </svg>
-        `
-      },
-      {
-        id: "elnueve",
-        number: 5,
-        category: "aire",
-        name: "El Nueve",
-        subtitle: "Canal 9",
-        themeClass: "card-elnueve",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "Web Oficial El Nueve (elnueve.com.ar/en-vivo)", type: "youtube-live", ytVideoId: "yGLVhAklLyM", ytLivePageUrl: "https://www.youtube.com/@elnueve/live" },
-          { label: "El Nueve Canal Oficial (YouTube)", type: "youtube-live", ytVideoId: "yGLVhAklLyM", ytLivePageUrl: "https://www.youtube.com/elnueve/live" }
-        ],
-        ytVideoId: "yGLVhAklLyM",
-        ytLivePageUrl: "https://www.youtube.com/@elnueve/live",
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#9d174d"/>
-            <circle cx="50" cy="44" r="28" fill="#f43f5e"/>
-            <text x="50" y="59" font-family="sans-serif" font-weight="900" font-size="44" fill="#ffffff" text-anchor="middle">9</text>
-            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">EL NUEVE</text>
-          </svg>
-        `
-      },
-      // CANAL 6: AMÉRICA TV — WEB OFICIAL (americatv.com.ar/vivo) YOUTUBE LIVE + GOOGLE DAI HLS
-      {
-        id: "americatv",
-        number: 6,
-        category: "aire",
-        name: "América TV",
-        subtitle: "Canal 2",
-        themeClass: "card-americatv",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          {
-            label: "YouTube Live Oficial (americatv.com.ar)",
-            type: "youtube-live",
-            ytVideoId: "ICgWhNv7X2Q",
-            ytLivePageUrl: "https://www.youtube.com/user/americatv/live"
-          },
-          {
-            label: "Web Oficial América TV (Google DAI HD)",
-            type: "hls",
-            url: "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
-            useProxy: false,
-            preferNativeAndroid: true
-          },
-          {
-            label: "Señal Directa 720p (ExoPlayer TV)",
-            type: "hls",
-            url: "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8",
-            useProxy: false,
-            preferNativeAndroid: true,
-            headers: {
-              "User-Agent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, como Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-              "Referer": "https://vmf.edge-apps.net/"
-            }
-          },
-          {
-            label: "Reproductor Web Oficial América TV",
-            type: "embed",
-            url: "https://vmf.edge-apps.net/embed/live.php?streamname=americahls-100056&autoplay=true"
+        }
+
+        const bust = forceRemote ? Date.now() : Math.floor(Date.now() / 60000);
+        const res = await fetch('channels.json?t=' + bust);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            CHANNELS = data;
+            try { localStorage.setItem(cacheKey, JSON.stringify(CHANNELS)); } catch (e) {}
+            renderChannelsGrid();
+            renderChannelBar();
+            return true;
           }
-        ],
-        hlsUrl: "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
-        ytVideoId: "ICgWhNv7X2Q",
-        ytLivePageUrl: "https://www.youtube.com/user/americatv/live",
-        useProxy: false,
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#0284c7"/>
-            <polygon points="50,18 82,80 18,80" fill="#ea580c"/>
-            <circle cx="50" cy="54" r="16" fill="#facc15"/>
-            <text x="50" y="93" font-family="sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">AMÉRICA</text>
-          </svg>
-        `
-      },
-      {
-        id: "a24",
-        number: 7,
-        category: "noticias",
-        name: "A24",
-        subtitle: "América 24",
-        themeClass: "card-a24",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          {
-            label: "YouTube Live Oficial (a24.com/vivo)",
-            type: "youtube-live",
-            ytVideoId: "ArKbAx1K-2U",
-            ytLivePageUrl: "https://www.youtube.com/@A24com/live"
-          },
-          {
-            label: "Web Oficial A24 (HLS 720p)",
-            type: "hls",
-            url: "http://g2.vxral-slo.transport.edge-access.net/a15/ngrp:a24-100056_all/Playlist.m3u8?sense=true",
-            useProxy: false,
-            preferNativeAndroid: true,
-            headers: {
-              "Referer": "https://vmf.edge-apps.net/"
-            }
-          },
-          {
-            label: "Reproductor Web Oficial A24",
-            type: "embed",
-            url: "https://vmf.edge-apps.net/embed/live.php?streamname=a24-100056&autoplay=true"
-          }
-        ],
-        hlsUrl: "http://g2.vxral-slo.transport.edge-access.net/a15/ngrp:a24-100056_all/Playlist.m3u8?sense=true",
-        ytVideoId: "ArKbAx1K-2U",
-        ytLivePageUrl: "https://www.youtube.com/@A24com/live",
-        useProxy: false,
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#1e3a8a"/>
-            <path d="M15 80 L35 24 L52 24 L70 80 L52 80 L47 62 L32 62 L27 80 Z" fill="#dc2626"/>
-            <text x="73" y="74" font-family="sans-serif" font-weight="900" font-size="34" fill="#ffffff" text-anchor="middle">24</text>
-          </svg>
-        `
-      },
-      {
-        id: "tvpublica",
-        number: 8,
-        category: "aire",
-        name: "TV Pública",
-        subtitle: "Canal 7",
-        themeClass: "card-tvpublica",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          {
-            label: "YouTube Live Oficial (canal7.com.ar)",
-            type: "youtube-live",
-            ytVideoId: "4snv3lXhzOw",
-            ytLivePageUrl: "https://www.youtube.com/channel/UCs231K71Bnu5295_x0MB5Pg/live"
-          },
-          {
-            label: "Web Oficial Canal 7 (HLS 720p)",
-            type: "hls",
-            url: "https://g5.mc-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8",
-            useProxy: false,
-            preferNativeAndroid: true,
-            headers: {
-              "Referer": "https://vmf.edge-apps.net/"
-            }
-          },
-          {
-            label: "Edge-Access Secundario",
-            type: "hls",
-            url: "https://g5.vxral-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8",
-            useProxy: false,
-            preferNativeAndroid: true
-          },
-          {
-            label: "Reproductor Web Oficial TV Pública",
-            type: "embed",
-            url: "https://vmf.edge-apps.net/embed/live.php?streamname=c7live01-20034&autoplay=true"
-          }
-        ],
-        hlsUrl: "https://g5.mc-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8",
-        ytVideoId: "4snv3lXhzOw",
-        ytLivePageUrl: "https://www.youtube.com/channel/UCs231K71Bnu5295_x0MB5Pg/live",
-        useProxy: false,
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#0369a1"/>
-            <rect x="0" y="35" width="100" height="30" fill="#ffffff"/>
-            <circle cx="50" cy="50" r="11" fill="#f59e0b"/>
-            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">TV PÚBLICA</text>
-          </svg>
-        `
-      },
-      {
-        id: "lnmas",
-        number: 9,
-        category: "noticias",
-        name: "LN+",
-        subtitle: "La Nación +",
-        themeClass: "card-lnmas",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "FEWZjXJ7M0c", ytLivePageUrl: "https://www.youtube.com/@lanacion/live" }
-        ],
-        ytVideoId: "FEWZjXJ7M0c",
-        ytLivePageUrl: "https://www.youtube.com/@lanacion/live",
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#091e3a"/>
-            <text x="36" y="66" font-family="sans-serif" font-weight="900" font-size="42" fill="#ffffff" text-anchor="middle">LN</text>
-            <text x="76" y="66" font-family="sans-serif" font-weight="900" font-size="48" fill="#38bdf8" text-anchor="middle">+</text>
-          </svg>
-        `
-      },
-      {
-        id: "cronica",
-        number: 10,
-        category: "noticias",
-        name: "Crónica",
-        subtitle: "Firme junto al pueblo",
-        themeClass: "card-cronica",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "hw4uHyct4vg", ytLivePageUrl: "https://www.youtube.com/@cronicatv/live" }
-        ],
-        ytVideoId: "hw4uHyct4vg",
-        ytLivePageUrl: "https://www.youtube.com/@cronicatv/live",
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#dc2626"/>
-            <rect x="8" y="24" width="84" height="42" rx="10" fill="#ffffff"/>
-            <text x="50" y="55" font-family="sans-serif" font-weight="900" font-size="18" fill="#dc2626" text-anchor="middle">CRONICA</text>
-            <text x="50" y="86" font-family="sans-serif" font-weight="800" font-size="13" fill="#facc15" text-anchor="middle">EN VIVO</text>
-          </svg>
-        `
-      },
-      {
-        id: "canalrural",
-        number: 11,
-        category: "aire",
-        name: "Canal Rural",
-        subtitle: "El campo en vivo",
-        themeClass: "card-canalrural",
-        type: "youtube-live",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "YouTube Live Oficial", type: "youtube-live", ytVideoId: "w78Zr0J-dIs", ytLivePageUrl: "https://www.youtube.com/@canalrural/live" }
-        ],
-        ytVideoId: "w78Zr0J-dIs",
-        ytLivePageUrl: "https://www.youtube.com/@canalrural/live",
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#14532d"/>
-            <path d="M50 20 C65 35 65 65 50 80 C35 65 35 35 50 20 Z" fill="#84cc16"/>
-            <text x="50" y="88" font-family="sans-serif" font-weight="800" font-size="12" fill="#ffffff" text-anchor="middle">RURAL</text>
-          </svg>
-        `
-      },
-      // --- DEPORTES (100% VERIFICADOS EN REPRODUCCIÓN REAL 1080P CON AUDIO) ---
-      {
-        id: "tycsports",
-        number: 12,
-        category: "deportes",
-        name: "TyC Sports",
-        subtitle: "Argentina / Internacional",
-        themeClass: "card-tycsports",
-        type: "hls",
-        currentSourceIndex: 0,
-        sources: [
-          { label: "VodGC Oficial 1080p (AR)", type: "hls", url: "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8", useProxy: false },
-          { label: "Amagi Global 1080p (Int/USA)", type: "hls", url: "https://amg26268-amg26268c14-freelivesports-emea-10267.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg26268-sportsstudio-tycsports-freelivesportsemea/playlist.m3u8", useProxy: false }
-        ],
-        hlsUrl: "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8",
-        useProxy: false,
-        logoSvg: `
-          <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" rx="20" fill="#0c4a6e"/>
-            <text x="50" y="54" font-family="sans-serif" font-weight="900" font-size="32" fill="#ffffff" text-anchor="middle">TyC</text>
-            <text x="50" y="80" font-family="sans-serif" font-weight="800" font-size="15" fill="#38bdf8" text-anchor="middle">SPORTS</text>
-          </svg>
-        `
+        }
+      } catch (err) {
+        console.warn('loadChannels: usando fuentes locales o caché:', err);
       }
-    ];
+      return false;
+    }
 
     /* ==========================================================================
        4. GESTIÓN DE FAVORITOS, ÚLTIMO CANAL VISTO Y GRILLA TV
@@ -1537,6 +1255,9 @@
       if (pillAire) pillAire.textContent = `📺 Aire (${aireCount})`;
       if (pillNoticias) pillNoticias.textContent = `📰 Noticias (${noticiasCount})`;
       if (pillDeportes) pillDeportes.textContent = `⚽ Deportes (${deportesCount})`;
+
+      const hintNumbers = document.getElementById("hint-direct-numbers");
+      if (hintNumbers) hintNumbers.textContent = `1 - ${CHANNELS.length}`;
     }
 
     function renderChannelsGrid() {
@@ -1575,9 +1296,7 @@
         card.setAttribute("aria-label", `Canal ${channel.number} ${channel.name} ${channel.subtitle}`);
 
         let typeLabel = "Señal";
-        if (channel.id === "andysports") {
-          typeLabel = `Hub (${channel.sources.length})`;
-        } else if (channel.id === "americatv") {
+        if (channel.id === "americatv") {
           typeLabel = "Directo";
         } else if (channel.sources && channel.sources.length > 1) {
           typeLabel = `Multi (${channel.sources.length})`;
@@ -1600,6 +1319,18 @@
           <div class="logo-container">${channel.logoSvg}</div>
           <div class="channel-title">${channel.name}</div>
           <div class="channel-subtitle">${channel.subtitle}</div>
+          ${(() => {
+            const epg = (window.AndyEpg && typeof window.AndyEpg.getChannelEpg === "function")
+              ? window.AndyEpg.getChannelEpg(channel.id)
+              : null;
+            if (!epg) return "";
+            return `
+              <div class="channel-epg-preview">
+                <div class="epg-now"><span class="epg-live-dot">●</span> <b>Ahora:</b> ${epg.now.title} <span class="epg-time">(${epg.now.start} - ${epg.now.end})</span></div>
+                <div class="epg-next"><b>Luego:</b> ${epg.next.title} (${epg.next.start})</div>
+              </div>
+            `;
+          })()}
         `;
 
         // Soporte para pulsación corta (abrir canal) y pulsación larga de 600ms en OK (marcar Favorito)
@@ -1669,29 +1400,33 @@
     });
 
     const channelBar = document.getElementById("channel-selector-bar");
-    CHANNELS.forEach((channel, index) => {
-      const btn = document.createElement("button");
-      btn.className = `btn-bar-channel ${channel.themeClass}`;
-      btn.id = `btn-bar-${channel.id}`;
-      btn.tabIndex = 0;
-      btn.textContent = `${channel.number}. ${channel.name}`;
+    function renderChannelBar() {
+      if (!channelBar) return;
+      channelBar.innerHTML = "";
+      CHANNELS.forEach((channel, index) => {
+        const btn = document.createElement("button");
+        btn.className = `btn-bar-channel ${channel.themeClass || ""}`;
+        btn.id = `btn-bar-${channel.id}`;
+        btn.tabIndex = 0;
+        btn.textContent = `${channel.number}. ${channel.name}`;
 
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        openChannel(index);
-        resetOverlayTimer();
-      });
-
-      btn.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.keyCode === 13) {
+        btn.addEventListener("click", (e) => {
           e.stopPropagation();
           openChannel(index);
           resetOverlayTimer();
-        }
-      });
+        });
 
-      channelBar.appendChild(btn);
-    });
+        btn.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.keyCode === 13) {
+            e.stopPropagation();
+            openChannel(index);
+            resetOverlayTimer();
+          }
+        });
+
+        channelBar.appendChild(btn);
+      });
+    }
 
     /* ==========================================================================
        5. MOTOR DE REPRODUCCIÓN MULTI-SEÑAL Y RESCATE DE PANTALLA NEGRA
@@ -1719,14 +1454,44 @@
     const playerOverlay = document.getElementById("player-overlay");
     const playerChannelName = document.getElementById("player-channel-name");
     const btnBack = document.getElementById("btn-back");
+    const btnRecall = document.getElementById("btn-recall");
     const btnSkipAd = document.getElementById("btn-skip-ad");
+    const playerOsdBottom = document.getElementById("player-osd-bottom");
+    const osdChannelNum = document.getElementById("osd-channel-num");
+    const osdChannelName = document.getElementById("osd-channel-name");
+    const osdProgTitle = document.getElementById("osd-prog-title");
+    const osdProgTime = document.getElementById("osd-prog-time");
+    const osdProgProgress = document.getElementById("osd-prog-progress");
+    const osdProgNext = document.getElementById("osd-prog-next");
+    let previousIndex = null;
+    let osdTimeout = null;
+
+    function showPlayerOsd(duration = 5000) {
+      if (!playerOsdBottom) return;
+      const channel = CHANNELS[currentIndex];
+      if (!channel) return;
+      const epg = (window.AndyEpg && typeof window.AndyEpg.getChannelEpg === "function")
+        ? window.AndyEpg.getChannelEpg(channel.id)
+        : { now: { title: "En Vivo", start: "", end: "", progress: 50 }, next: { title: "Programación Regular", start: "" } };
+
+      if (osdChannelNum) osdChannelNum.textContent = channel.number;
+      if (osdChannelName) osdChannelName.textContent = channel.name;
+      if (osdProgTitle) osdProgTitle.textContent = epg.now.title;
+      if (osdProgTime) osdProgTime.textContent = (epg.now.start && epg.now.end) ? `${epg.now.start} - ${epg.now.end}` : "En Vivo";
+      if (osdProgProgress) osdProgProgress.style.width = `${epg.now.progress || 50}%`;
+      if (osdProgNext) osdProgNext.textContent = epg.next.start ? `${epg.next.title} (${epg.next.start})` : epg.next.title;
+
+      playerOsdBottom.classList.remove("hidden");
+      clearTimeout(osdTimeout);
+      if (duration > 0) {
+        osdTimeout = setTimeout(() => {
+          playerOsdBottom.classList.add("hidden");
+        }, duration);
+      }
+    }
     const btnSwitchSource = document.getElementById("btn-switch-source");
     const btnAspectRatio = document.getElementById("btn-aspect-ratio");
     const btnToggleFav = document.getElementById("btn-toggle-fav");
-    const btnAndySportsHub = null;
-    const andysportsModal = document.getElementById("andysports-modal");
-    const andysportsHubList = document.getElementById("andysports-hub-list");
-    const btnCloseAndySports = document.getElementById("btn-close-andysports");
     const rescueHint = document.getElementById("rescue-hint");
     const btnRescueSwitch = document.getElementById("btn-rescue-switch");
     const zappingToast = document.getElementById("zapping-toast");
@@ -1781,346 +1546,6 @@
     }
 
 
-
-    // Cartelera y Agenda Deportiva en Tiempo Real exclusiva de AndySports (Canal 14)
-    const andysportsEventsList = document.getElementById("andysports-events-list");
-    const andysportsAgendaStatus = document.getElementById("andysports-agenda-status");
-    const btnRefreshAgenda = document.getElementById("btn-refresh-agenda");
-
-    const SPORTS_AGENDA_ENDPOINTS = [
-      { tag: "⚽ Fútbol en Vivo Hoy", url: "https://site.api.espn.com/apis/site/v2/sports/soccer/scorepanel", isScorepanel: true, preferredIdx: 0 },
-      { tag: "🏀 NBA Hoy", url: "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard", preferredIdx: 3 },
-      { tag: "🇦🇷 Liga Profesional AR", url: "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard", preferredIdx: 0 },
-      { tag: "🏆 Copa Libertadores", url: "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard", preferredIdx: 1 },
-      { tag: "🏆 Copa Sudamericana", url: "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard", preferredIdx: 0 },
-      { tag: "⭐ Champions League", url: "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard", preferredIdx: 1 },
-      { tag: "🇪🇸 LaLiga España", url: "https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard", preferredIdx: 0 },
-      { tag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League", url: "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard", preferredIdx: 1 },
-      { tag: "🏎️ Fórmula 1", url: "https://site.api.espn.com/apis/site/v2/sports/racing/f1/scoreboard", preferredIdx: 4 },
-      { tag: "🎾 Tenis ATP", url: "https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard", preferredIdx: 0 }
-    ];
-
-    let cachedSportsEvents = [];
-    let lastAgendaFetchTime = 0;
-    // Pool dinámico de IPs y señales deportivas descubiertas (IPTV-ORG + Listas M3U) para resolución por evento
-    const DISCOVERED_SPORTS_POOL = [];
-
-    function registerDiscoveredSportsStream(entry) {
-      if (!entry || !entry.url) return;
-      if (!DISCOVERED_SPORTS_POOL.some(x => x.url === entry.url)) {
-        DISCOVERED_SPORTS_POOL.push(entry);
-      }
-    }
-
-    async function fetchLiveSportsAgenda(forceRefresh = false) {
-      if (!andysportsEventsList) return;
-      const andyChIdx = CHANNELS.findIndex(c => c.id === "andysports");
-      const andyCh = andyChIdx >= 0 ? CHANNELS[andyChIdx] : null;
-
-      if (!forceRefresh && cachedSportsEvents.length > 0 && (Date.now() - lastAgendaFetchTime < 120000)) {
-        renderAgendaEventsList(cachedSportsEvents, andyChIdx, andyCh);
-        return;
-      }
-
-      if (andysportsAgendaStatus) {
-        andysportsAgendaStatus.textContent = "🔄 Consultando agenda y partidos de hoy en vivo...";
-      }
-      andysportsEventsList.innerHTML = `
-        <div class="sports-hub-item" style="grid-column: 1 / -1; text-align: center;">
-          <span class="sh-title">⏳ Cargando agenda deportiva en vivo...</span>
-        </div>
-      `;
-
-      try {
-        const results = await Promise.all(SPORTS_AGENDA_ENDPOINTS.map(async (ep) => {
-          try {
-            const resp = await fetch(ep.url);
-            if (!resp.ok) return [];
-            const data = await resp.json();
-
-            let rawEvents = [];
-            if (ep.isScorepanel && data.scores) {
-              data.scores.forEach(s => {
-                const lName = (s.league && (s.league.abbreviation || s.league.name)) || "Fútbol";
-                (s.events || []).forEach(e => {
-                  rawEvents.push({ ...e, customLeagueTag: lName });
-                });
-              });
-            } else {
-              rawEvents = data.events || [];
-            }
-
-            return rawEvents.slice(0, 12).map(ev => {
-              const comp = (ev.competitions && ev.competitions[0]) || {};
-              const competitors = comp.competitors || [];
-              const stateObj = (ev.status && ev.status.type) || {};
-              const state = stateObj.state || "pre"; // 'in' = en vivo, 'pre' = programado, 'post' = finalizado
-              const detail = stateObj.shortDetail || stateObj.detail || "";
-
-              let title = ev.shortName || ev.name || "Evento Deportivo";
-              let homeName = "";
-              let awayName = "";
-              if (competitors.length === 2) {
-                homeName = competitors[0].team ? competitors[0].team.shortDisplayName : "Local";
-                awayName = competitors[1].team ? competitors[1].team.shortDisplayName : "Visitante";
-                if (state === "in" || state === "post") {
-                  title = `${homeName} ${competitors[0].score || 0} - ${competitors[1].score || 0} ${awayName}`;
-                } else {
-                  title = `${homeName} vs ${awayName}`;
-                }
-              }
-
-              let timeStr = detail;
-              if (ev.date && state === "pre") {
-                try {
-                  const d = new Date(ev.date);
-                  const hh = String(d.getHours()).padStart(2, "0");
-                  const mm = String(d.getMinutes()).padStart(2, "0");
-                  const today = new Date();
-                  const isToday = d.toDateString() === today.toDateString();
-                  timeStr = isToday ? `⏰ HOY ${hh}:${mm} hs` : `📅 ${d.getDate()}/${d.getMonth() + 1} ${hh}:${mm} hs`;
-                } catch (e) {}
-              } else if (state === "in") {
-                timeStr = `🔴 EN VIVO • ${detail}`;
-              } else if (state === "post") {
-                timeStr = `✅ FINAL • ${detail}`;
-              }
-
-              // Emisora oficial reportada por la API
-              let broadcastName = "";
-              if (comp.broadcasts && comp.broadcasts[0] && comp.broadcasts[0].names) {
-                broadcastName = comp.broadcasts[0].names.join(" / ");
-              }
-
-              const searchQuery = (homeName && awayName) ? `${homeName} ${awayName}` : (ev.name || title);
-              const leagueTag = ev.customLeagueTag || ep.tag;
-
-              return {
-                leagueTag,
-                title,
-                homeName,
-                awayName,
-                searchQuery,
-                timeStr,
-                state,
-                broadcastName,
-                preferredIdx: ep.preferredIdx
-              };
-            });
-          } catch (e) {
-            return [];
-          }
-        }));
-
-        const allEvents = results.flat();
-        // Quitar duplicados por nombre/búsqueda
-        const seen = new Set();
-        const uniqueEvents = allEvents.filter(e => {
-          const key = (e.searchQuery || e.title).toLowerCase();
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
-
-        // Prioridad: 1° EN VIVO ('in'), 2° PROGRAMADOS HOY ('pre'), 3° FINALIZADOS ('post')
-        const orderMap = { in: 0, pre: 1, post: 2 };
-        uniqueEvents.sort((a, b) => (orderMap[a.state] ?? 3) - (orderMap[b.state] ?? 3));
-
-        cachedSportsEvents = uniqueEvents.slice(0, 8);
-        lastAgendaFetchTime = Date.now();
-
-        if (andysportsAgendaStatus) {
-          const liveCount = uniqueEvents.filter(e => e.state === "in").length;
-          andysportsAgendaStatus.textContent = liveCount > 0
-            ? `🔴 ${liveCount} evento(s) EN VIVO ahora • ${uniqueEvents.length} en cartelera de hoy`
-            : `🟢 ${uniqueEvents.length} partidos y eventos disponibles hoy`;
-        }
-
-        renderAgendaEventsList(cachedSportsEvents, andyChIdx, andyCh);
-      } catch (e) {
-        if (andysportsAgendaStatus) {
-          andysportsAgendaStatus.textContent = "⚠️ Agenda offline — Señales directas activas";
-        }
-      }
-    }
-
-    // Motor estilo AK47: Busca dinámicamente una IP / Stream en vivo que esté pasando el partido o su emisora
-    async function tuneEventLiveStream(ev, andyChIdx, andyCh) {
-      if (!andyCh || andyChIdx < 0) return;
-      andysportsModal.style.display = "none";
-
-      // Preparar vista del reproductor mientras escanea IPs / Streams para este partido
-      currentIndex = andyChIdx;
-      setLastWatchedChannelId(andyCh.id);
-      viewHome.style.display = "none";
-      viewPlayer.style.display = "flex";
-      playerChannelName.textContent = `${andyCh.number}. ${andyCh.name} — ${ev.title}`;
-      updateFavButtonState();
-      updateActiveButtonInBar();
-      resetOverlayTimer();
-      showLoading(`🔍 Buscando IP / transmisión en vivo para: ${ev.title}...`);
-
-      // 1) Armar lista inteligente de palabras clave para asociar con la señal deportiva adecuada
-      const kwList = [];
-      if (ev.broadcastName) {
-        ev.broadcastName.split(/[\/,&]/).forEach(b => {
-          const clean = b.trim().toLowerCase();
-          if (clean.length >= 2) kwList.push(clean);
-        });
-      }
-      if (ev.homeName && ev.homeName.length >= 3) kwList.push(ev.homeName.toLowerCase());
-      if (ev.awayName && ev.awayName.length >= 3) kwList.push(ev.awayName.toLowerCase());
-
-      // 2) Asignar directamente a la señal deportiva correspondiente del Hub (Canal 14)
-      // Señal 1: TyC Sports (Fútbol Argentino, Copa Argentina, Polideportivo)
-      // Señal 2: TNT Sports (Fútbol Argentino y Sudamérica)
-      // Señal 3: FIFA+ TV HD (Partidos de ligas de fútbol 24hs)
-      // Señal 4: TyC Sports Internacional (Fútbol y básquet internacional)
-      // Señal 5: Red Bull TV (Motor, Rally, Extremos, F1)
-      // Señal 6: Claro Sports (Eventos Olímpicos, Polideportivo y Fútbol)
-      let matchedSourceIdx = ev.preferredIdx || 0;
-      const combinedInfo = `${ev.leagueTag} ${ev.broadcastName || ""} ${ev.title}`.toLowerCase();
-
-      if (/tnt\s*sports/i.test(combinedInfo)) {
-        matchedSourceIdx = 1;
-      } else if (/tyc\s*sports/i.test(combinedInfo)) {
-        matchedSourceIdx = 0;
-      } else if (/f[oó]rmula|motor|rally|extremo|red\s*bull/i.test(combinedInfo)) {
-        matchedSourceIdx = 4;
-      } else if (/claro|juegos|ol[ií]mpic/i.test(combinedInfo)) {
-        matchedSourceIdx = 5;
-      } else if (/nba|b[aá]squet|fiba/i.test(combinedInfo)) {
-        matchedSourceIdx = 3;
-      } else if (/fifa|f[uú]tbol|liga|copa/i.test(combinedInfo)) {
-        matchedSourceIdx = 2; // FIFA+ TV Fútbol
-      }
-
-      // 3) Buscar también si hay una IP específica activa descubierta en IPTV-ORG
-      const matchingPool = DISCOVERED_SPORTS_POOL.filter(item => {
-        const hay = `${item.name} ${item.extinf || ""}`.toLowerCase();
-        return kwList.some(k => hay.includes(k));
-      });
-
-      for (let i = 0; i < Math.min(matchingPool.length, 4); i++) {
-        const cand = matchingPool[i];
-        const check = await probeHlsUrlAlive(cand.url);
-        if (check.alive) {
-          const dynamicLabel = `🎯 IP Evento (${cand.name}): ${ev.title}`;
-          let existingIdx = andyCh.sources.findIndex(s => s.url === cand.url);
-          if (existingIdx < 0) {
-            andyCh.sources.push({
-              label: dynamicLabel,
-              type: "hls",
-              url: cand.url,
-              useProxy: check.useProxy,
-              preferNativeAndroid: !!(cand.headers && Object.keys(cand.headers).length > 0),
-              headers: cand.headers
-            });
-            existingIdx = andyCh.sources.length - 1;
-          } else {
-            andyCh.sources[existingIdx].label = dynamicLabel;
-          }
-          andyCh.currentSourceIndex = existingIdx;
-          showZappingToast({ number: andyCh.number, name: `IP Encontrada: ${cand.name}` });
-          playCurrentChannel();
-          return;
-        }
-      }
-
-      // 4) Sintonizar la señal del Hub que transmite la disciplina/liga
-      andyCh.currentSourceIndex = (andyCh.sources && andyCh.sources[matchedSourceIdx]) ? matchedSourceIdx : 0;
-      const tunedLabel = andyCh.sources[andyCh.currentSourceIndex]?.label || "Señal Deportiva";
-      showZappingToast({
-        number: andyCh.number,
-        name: `${ev.title} (${tunedLabel})`
-      });
-      playCurrentChannel();
-    }
-
-    function renderAgendaEventsList(events, andyChIdx, andyCh) {
-      if (!andysportsEventsList) return;
-      andysportsEventsList.innerHTML = "";
-
-      if (!events || events.length === 0) {
-        andysportsEventsList.innerHTML = `
-          <div class="sports-hub-item" style="grid-column: 1 / -1; text-align: center;">
-            <span class="sh-title">Seleccioná cualquiera de las señales deportivas de arriba para ver en vivo</span>
-          </div>
-        `;
-        return;
-      }
-
-      events.slice(0, 8).forEach((ev) => {
-        const btn = document.createElement("button");
-        btn.className = `sports-hub-item ${ev.state === "in" ? "active" : ""}`;
-        btn.tabIndex = 0;
-        const targetSourceIdx = (andyCh && andyCh.sources && andyCh.sources[ev.preferredIdx]) ? ev.preferredIdx : 0;
-        const fallbackLabel = (andyCh && andyCh.sources && andyCh.sources[targetSourceIdx])
-          ? andyCh.sources[targetSourceIdx].label.replace(/^.*?Señal \d+:\s*/i, "")
-          : "Señal Deportiva";
-        const broadcastInfo = ev.broadcastName
-          ? `🔍 Buscar IP (${ev.broadcastName}) / ${fallbackLabel}`
-          : `🔍 Buscar IP en vivo / ${fallbackLabel}`;
-
-        btn.innerHTML = `
-          <span class="sh-tag">${ev.leagueTag} • ${ev.timeStr}</span>
-          <span class="sh-title">${ev.title}</span>
-          <span class="sh-sub">${broadcastInfo}</span>
-        `;
-        btn.addEventListener("click", () => {
-          tuneEventLiveStream(ev, andyChIdx, andyCh);
-        });
-        andysportsEventsList.appendChild(btn);
-      });
-    }
-
-    if (btnRefreshAgenda) {
-      btnRefreshAgenda.addEventListener("click", (e) => {
-        e.stopPropagation();
-        fetchLiveSportsAgenda(true);
-      });
-    }
-
-    function openAndySportsHub() {
-      const andyChIdx = CHANNELS.findIndex(c => c.id === "andysports");
-      if (andyChIdx < 0) return;
-      const andyCh = CHANNELS[andyChIdx];
-      andysportsHubList.innerHTML = "";
-
-      // Mostrar las 6 señales principales en 1 sola fila fija (sin desbordar la pantalla)
-      (andyCh.sources || []).slice(0, 6).forEach((src, sIdx) => {
-        const btn = document.createElement("button");
-        const isCurrent = (currentIndex === andyChIdx && (andyCh.currentSourceIndex || 0) === sIdx);
-        btn.className = `sports-hub-item ${isCurrent ? "active" : ""}`;
-        btn.tabIndex = 0;
-        const typeTag = src.type === "youtube-live" ? "YouTube Oficial" : "HD 1080p";
-        const shortTitle = (src.label || `Señal ${sIdx + 1}`).replace(/^.*?Señal \d+:\s*/i, "");
-        btn.innerHTML = `
-          <span class="sh-tag">Señal #${sIdx + 1} • ${typeTag}</span>
-          <span class="sh-title">${shortTitle}</span>
-          <span class="sh-sub">${isCurrent ? "🟢 En reproducción" : "OK para sintonizar"}</span>
-        `;
-        btn.addEventListener("click", () => {
-          andyCh.currentSourceIndex = sIdx;
-          andysportsModal.style.display = "none";
-          openChannel(andyChIdx, true);
-        });
-        andysportsHubList.appendChild(btn);
-      });
-
-      andysportsModal.style.display = "flex";
-      fetchLiveSportsAgenda(false);
-
-      const activeBtn = andysportsHubList.querySelector(".sports-hub-item.active") || andysportsHubList.querySelector(".sports-hub-item");
-      if (activeBtn) activeBtn.focus();
-    }
-
-    if (btnCloseAndySports) {
-      btnCloseAndySports.addEventListener("click", () => {
-        if (andysportsModal) andysportsModal.style.display = "none";
-        if (btnBack) btnBack.focus();
-      });
-    }
 
     function showLoading(text) {
       loadingText.textContent = text;
@@ -2238,6 +1663,13 @@
 
     function openChannel(index, skipHubAutoOpen = false) {
       const wasHomeVisible = viewHome.style.display !== "none";
+      if (currentIndex !== null && currentIndex !== index) {
+        previousIndex = currentIndex;
+        if (btnRecall && previousIndex >= 0 && previousIndex < CHANNELS.length) {
+          btnRecall.style.display = "inline-flex";
+          btnRecall.textContent = `↩ ${CHANNELS[previousIndex].name}`;
+        }
+      }
       currentIndex = index;
       const channel = CHANNELS[currentIndex];
       setLastWatchedChannelId(channel.id);
@@ -2249,11 +1681,10 @@
 
       updateActiveButtonInBar();
       showZappingToast(channel);
+      showPlayerOsd(5000);
       resetOverlayTimer();
 
       playCurrentChannel();
-
-
     }
 
     function changeChannelRelative(delta) {
@@ -2297,7 +1728,7 @@
       const hasCustomHeaders = !!(source && source.headers && Object.keys(source.headers).length > 0);
 
       // Si estamos en Android TV y la fuente prefiere decodificación por hardware nativo (ExoPlayer) o requiere headers HTTP (#EXTVLCOPT)
-      if (!skipNativeAndroid && (source?.preferNativeAndroid || hasCustomHeaders) && window.AndroidBridge) {
+      if (!skipNativeAndroid && window.AndroidBridge) {
         video.style.display = "none";
         iframe.style.display = "none";
         document.body.style.backgroundColor = "transparent";
@@ -2709,7 +2140,7 @@
     });
 
     /* ==========================================================================
-       6. MODAL Y PARSER M3U AVANZADO (#EXTVLCOPT / HEADERS / ANDYSPORTS)
+       6. MODAL Y PARSER M3U AVANZADO (#EXTVLCOPT / HEADERS HTTP)
        ========================================================================== */
     const m3uModal = document.getElementById("m3u-modal");
     const btnOpenM3u = document.getElementById("btn-open-m3u");
@@ -2725,7 +2156,6 @@
       let lastTitle = "";
       let lastDisplayName = "";
       let pendingHeaders = {};
-      const andySportsChannel = CHANNELS.find(c => c.id === "andysports");
 
       lines.forEach(line => {
         const l = line.trim();
@@ -2778,7 +2208,6 @@
 
           let matchedAny = false;
           CHANNELS.forEach(ch => {
-            if (ch.id === "andysports") return;
             const nameLower = ch.name.toLowerCase();
             if (lastTitle.includes(nameLower)) {
               if (!ch.sources) ch.sources = [];
@@ -2789,23 +2218,6 @@
               }
             }
           });
-
-          // Si es una señal deportiva (ESPN, Fox Sports, DSports, F1, Pack Fútbol, etc.), sumarla también a AndySports y al Pool de Eventos
-          if (andySportsChannel && SPORTS_KEYWORDS_REGEX.test(lastTitle)) {
-            registerDiscoveredSportsStream({
-              name: lastDisplayName || "Deportes M3U",
-              extinf: lastTitle,
-              url: cleanUrl,
-              headers: hasHeaders ? { ...pendingHeaders } : undefined
-            });
-            if (!andySportsChannel.sources.some(s => s.url === cleanUrl)) {
-              andySportsChannel.sources.push({
-                ...newSourceObj,
-                label: `⚽ ${lastDisplayName || "Deportes M3U"}`
-              });
-              if (!matchedAny) matched++;
-            }
-          }
 
           lastTitle = "";
           lastDisplayName = "";
@@ -2867,7 +2279,7 @@
         const text = await res.text();
         const matched = parseAndMergeM3uText(text, "Lista M3U");
 
-        alert(`¡Lista M3U guardada! Se integraron ${matched} señales (incluyendo canales deportivos en AndySports).`);
+        alert(`¡Lista M3U guardada! Se integraron ${matched} señales.`);
         renderChannelsGrid();
       } catch (e) {
         alert("Lista guardada, pero no se pudo escanear en este momento: " + e.message);
@@ -2907,28 +2319,43 @@
         return;
       }
 
-      // Manejo de teclado numérico (1 a 13)
+      // Atajo Recall: alternar con el último canal (Tecla '0', 'R' o Tecla Verde de control remoto 184)
+      if (isPlayerOpen && (e.key === "0" || e.key === "r" || e.key === "R" || e.keyCode === 184) && previousIndex !== null && !numericBuffer) {
+        e.preventDefault();
+        openChannel(previousIndex);
+        return;
+      }
+
+      // Tecla Info / Flecha Abajo para desplegar Barra OSD con Guía EPG
+      if (isPlayerOpen && (e.key === "i" || e.key === "I" || e.keyCode === 170)) {
+        showPlayerOsd(6000);
+      }
+
+      // Manejo de teclado numérico multidígito (1 a 99 con 1.5s de buffer y feedback visual)
       if (/^[0-9]$/.test(e.key)) {
         if (m3uModal.style.display === "flex") return;
         numericBuffer += e.key;
         clearTimeout(numericBufferTimeout);
+        const targetCh = CHANNELS.find(c => String(c.number) === numericBuffer);
+        showZappingToast({
+          number: numericBuffer,
+          name: targetCh ? targetCh.name : "Sintonizando..."
+        });
         numericBufferTimeout = setTimeout(() => {
           const num = parseInt(numericBuffer, 10);
           numericBuffer = "";
-          if (num >= 1 && num <= CHANNELS.length) {
+          const chIdx = CHANNELS.findIndex(c => c.number === num);
+          if (chIdx !== -1) {
+            openChannel(chIdx);
+          } else if (num >= 1 && num <= CHANNELS.length) {
             openChannel(num - 1);
           }
-        }, 900);
+        }, 1500);
         return;
       }
 
       // Tecla Back / Escape
       if (e.key === "Escape" || e.key === "Backspace" || e.keyCode === 27 || e.keyCode === 4) {
-        if (andysportsModal && andysportsModal.style.display === "flex") {
-          andysportsModal.style.display = "none";
-          e.preventDefault();
-          return;
-        }
         if (m3uModal.style.display === "flex") {
           m3uModal.style.display = "none";
           e.preventDefault();
@@ -2942,48 +2369,6 @@
           }
           closePlayer();
           e.preventDefault();
-          return;
-        }
-      }
-
-      // Navegación por Cruceta 2D (D-Pad ◄ ▲ ▼ ►) dentro de la grilla de pantalla única de AndySports
-      if (andysportsModal && andysportsModal.style.display === "flex") {
-        const isArrow = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key);
-        if (isArrow) {
-          e.preventDefault();
-          const signalsRow = Array.from(andysportsHubList.querySelectorAll(".sports-hub-item"));
-          const allEvents = Array.from(andysportsEventsList.querySelectorAll(".sports-hub-item"));
-          const eventsRow1 = allEvents.slice(0, 4);
-          const eventsRow2 = allEvents.slice(4, 8);
-          const actionsRow = [btnRefreshAgenda, btnCloseAndySports].filter(Boolean);
-          const rows = [signalsRow, eventsRow1, eventsRow2, actionsRow].filter(r => r.length > 0);
-          const active = document.activeElement;
-
-          let rIdx = rows.findIndex(r => r.includes(active));
-          let cIdx = rIdx >= 0 ? rows[rIdx].indexOf(active) : 0;
-
-          if (rIdx < 0) {
-            if (rows[0] && rows[0][0]) rows[0][0].focus();
-            return;
-          }
-
-          if (e.key === "ArrowRight") {
-            const nextC = Math.min(rows[rIdx].length - 1, cIdx + 1);
-            rows[rIdx][nextC].focus();
-          } else if (e.key === "ArrowLeft") {
-            const prevC = Math.max(0, cIdx - 1);
-            rows[rIdx][prevC].focus();
-          } else if (e.key === "ArrowDown") {
-            const nextR = Math.min(rows.length - 1, rIdx + 1);
-            const ratio = rows[rIdx].length > 1 ? cIdx / (rows[rIdx].length - 1) : 0;
-            const targetC = Math.min(rows[nextR].length - 1, Math.round(ratio * (rows[nextR].length - 1)));
-            rows[nextR][targetC].focus();
-          } else if (e.key === "ArrowUp") {
-            const prevR = Math.max(0, rIdx - 1);
-            const ratio = rows[rIdx].length > 1 ? cIdx / (rows[rIdx].length - 1) : 0;
-            const targetC = Math.min(rows[prevR].length - 1, Math.round(ratio * (rows[prevR].length - 1)));
-            rows[prevR][targetC].focus();
-          }
           return;
         }
       }
@@ -3036,8 +2421,8 @@
       }
 
       // En el reproductor: navegación por control remoto y acceso directo a controles
-      if (isPlayerOpen && (!andysportsModal || andysportsModal.style.display !== "flex")) {
-        const topBtns = [btnBack, btnSwitchSource, btnAspectRatio, btnToggleFav, btnSkipAd]
+      if (isPlayerOpen) {
+        const topBtns = [btnBack, btnRecall, btnSwitchSource, btnAspectRatio, btnToggleFav, btnSkipAd]
           .filter(b => b && b.style.display !== "none");
         const sideBtns = Array.from(channelBar.querySelectorAll(".btn-bar-channel"));
         const active = document.activeElement;
@@ -3157,10 +2542,6 @@
     });
 
     window.onAndroidBackPressed = function() {
-      if (andysportsModal && andysportsModal.style.display === "flex") {
-        andysportsModal.style.display = "none";
-        return true;
-      }
       if (m3uModal.style.display === "flex") {
         m3uModal.style.display = "none";
         return true;
@@ -3210,8 +2591,7 @@
       cronica: /\b(cr[oó]nica)\b/i,
       canalrural: /\b(canal rural|el rural)\b/i,
       tycsports: /\b(tycsports\.(ar|latam|usa)|tyc\s*sports)/i,
-      tntsports: /\b(tnt\s*sports|tntsports\.(ar|cl)|tntsportspremium)/i,
-      andysports: /\b(deportv|am[eé]rica\s*sports|espn|fox\s*sports|dsports|directv\s*sports|red\s*bull\s*tv|claro\s*sports|tyc\s*sports|tnt\s*sports)/i
+      tntsports: /\b(tnt\s*sports|tntsports\.(ar|cl)|tntsportspremium)/i
     };
 
     const DEAD_HOSTS_BLACKLIST = [
@@ -3383,28 +2763,38 @@
 
     const btnSyncCloud = document.getElementById("btn-sync-cloud");
     if (btnSyncCloud) {
-      btnSyncCloud.addEventListener("click", () => {
+      btnSyncCloud.addEventListener("click", async () => {
+        btnSyncCloud.textContent = "⏳ Actualizando...";
+        await loadChannels(true);
         if (window.AndroidBridge && typeof window.AndroidBridge.reloadRemoteApp === "function") {
           window.AndroidBridge.reloadRemoteApp();
         } else {
           syncIptvOrgSources(true);
-          window.location.reload();
+          setTimeout(() => {
+            btnSyncCloud.textContent = "🔄 Actualizar";
+          }, 1500);
         }
       });
     }
 
-    // Renderizado inmediato al evaluar el script (garantiza que la grilla aparezca al instante sin pantalla negra)
+    // Renderizado inmediato al evaluar el script
     renderChannelsGrid();
+    renderChannelBar();
 
     // Iniciar foco inicial en el último canal visto y sincronización inteligente en segundo plano
-    function initAppFocusAndSync() {
+    async function initAppFocusAndSync() {
+      await loadChannels(false);
       renderChannelsGrid();
+      renderChannelBar();
       const lastId = getLastWatchedChannelId();
       const lastIdx = lastId ? CHANNELS.findIndex(c => c.id === lastId) : -1;
-      const targetCard = (lastIdx >= 0 && document.getElementById(`card-channel-${lastIdx}`))
-        || document.getElementById("card-channel-0")
-        || channelCardsElements[0];
-      if (targetCard) targetCard.focus();
+      if (lastIdx >= 0) {
+        // Retomar el último canal al abrir la app como un televisor real
+        openChannel(lastIdx);
+      } else {
+        const targetCard = document.getElementById("card-channel-0") || channelCardsElements[0];
+        if (targetCard) targetCard.focus();
+      }
       loadSavedCustomM3uSilently();
       setTimeout(() => syncIptvOrgSources(false), 1500);
     }
