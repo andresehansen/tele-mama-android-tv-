@@ -1180,13 +1180,35 @@
       if (metaRef) metaRef.setAttribute("content", policy);
     }
 
+    function hasUserActivation() {
+      return (navigator.userActivation && navigator.userActivation.hasBeenActive) || false;
+    }
+
     function buildYtEmbedUrl(videoId) {
       const originUrl = (window.location && window.location.origin && window.location.origin.startsWith("http"))
         ? window.location.origin
         : "https://andresehansen.github.io";
       const encOrigin = encodeURIComponent(originUrl);
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${encOrigin}&widget_referrer=${encOrigin}`;
+      // En navegadores de PC (al presionar F5 sin interacción), YouTube bloquea autoplay si mute=0.
+      // Al usar mute=1 condicional o permitir autoplay, garantizamos que el video nunca quede congelado.
+      const muteParam = hasUserActivation() ? "0" : "1";
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${encOrigin}&widget_referrer=${encOrigin}`;
     }
+
+    // Desmutear audio al primer toque de tecla o click si el navegador forzó autoplay silenciado en el primer arranque
+    function enableGlobalAudioOnFirstGesture() {
+      if (video && video.muted) {
+        video.muted = false;
+      }
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+          iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        } catch (e) {}
+      }
+    }
+    window.addEventListener("keydown", enableGlobalAudioOnFirstGesture, { capture: true });
+    window.addEventListener("pointerdown", enableGlobalAudioOnFirstGesture, { capture: true });
 
     /* ==========================================================================
        3. GESTOR MODULAR DE CANALES (channels.json)
@@ -1857,9 +1879,12 @@
           const playPromise = video.play();
           if (playPromise !== undefined) {
             playPromise.catch((err) => {
-              console.log("Autoplay con audio bloqueado, reintentando:", err);
-              video.muted = false;
-              video.play().catch(e => console.log("Play error:", e));
+              console.log("Autoplay con audio bloqueado por el navegador (F5), arrancando muteado:", err);
+              video.muted = true;
+              video.play().then(() => {
+                // Si el usuario toca cualquier tecla o click, activar audio al instante
+                enableGlobalAudioOnFirstGesture();
+              }).catch(e => console.log("Play error:", e));
             });
           }
         });
