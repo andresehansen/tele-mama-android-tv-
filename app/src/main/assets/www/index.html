@@ -41,14 +41,16 @@
       flex-direction: column;
     }
 
-    /* VISTA DE INICIO (ADAPTADA A 16:9 TV) */
+    /* VISTA DE INICIO (ADAPTADA A 16:9 TV Y PANTALLAS DE PC) */
     #view-home {
       display: flex;
       flex-direction: column;
       flex: 1;
       height: 100vh;
-      padding: 20px 40px 16px 40px;
-      width: 100%;
+      padding: 14px 28px 12px 28px;
+      width: 100vw;
+      max-width: 100vw;
+      box-sizing: border-box;
       justify-content: space-between;
       overflow: hidden;
     }
@@ -57,35 +59,40 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       border-bottom: 2px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
+      gap: 10px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .brand-title {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .brand-title h1 {
-      font-size: 2.3rem;
+      font-size: 1.85rem;
       font-weight: 900;
       letter-spacing: -0.5px;
       color: #f8fafc;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .badge-live {
       background: #e11d48;
       color: white;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 800;
-      padding: 3px 12px;
+      padding: 3px 10px;
       border-radius: 9999px;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       animation: pulse 2s infinite;
     }
@@ -98,19 +105,28 @@
     .category-pills {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: nowrap;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .category-pills::-webkit-scrollbar {
+      display: none;
     }
 
     .btn-pill {
       background: rgba(255, 255, 255, 0.08);
       color: #cbd5e1;
       border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 8px 18px;
+      padding: 6px 14px;
       border-radius: 999px;
-      font-size: 1.05rem;
+      font-size: 0.94rem;
       font-weight: 800;
       cursor: pointer;
       outline: none;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.15s ease;
     }
 
@@ -119,7 +135,7 @@
       background: #facc15;
       color: #000;
       border-color: #ffffff;
-      transform: scale(1.06);
+      transform: scale(1.05);
       box-shadow: 0 0 16px rgba(250, 204, 21, 0.6);
     }
 
@@ -132,19 +148,21 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .btn-config-m3u {
       background: rgba(255, 255, 255, 0.08);
       color: #e2e8f0;
       border: 2px solid rgba(255, 255, 255, 0.25);
-      padding: 7px 16px;
+      padding: 6px 12px;
       border-radius: 12px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 800;
       cursor: pointer;
       outline: none;
+      white-space: nowrap;
       transition: all 0.15s ease;
     }
 
@@ -156,32 +174,40 @@
     }
 
     .clock-display {
-      font-size: 1.6rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: #facc15;
       font-variant-numeric: tabular-nums;
       background: rgba(15, 23, 42, 0.85);
-      padding: 6px 16px;
-      border-radius: 14px;
+      padding: 5px 12px;
+      border-radius: 12px;
       border: 1px solid rgba(250, 204, 21, 0.3);
+      flex-shrink: 0;
     }
 
-    /* Grilla desplazable con control remoto */
+    /* Grilla desplazable con control remoto (100% confinada al ancho sin cortar columnas) */
     .grid-scroll-wrapper {
       flex: 1;
       overflow-y: auto;
-      margin: 12px 0;
-      padding-right: 6px;
+      overflow-x: hidden;
+      margin: 10px 0;
+      padding-right: 4px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       scrollbar-width: thin;
       scrollbar-color: #38bdf8 rgba(15, 23, 42, 0.6);
     }
 
     .channels-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
       align-content: start;
-      padding: 6px 4px 14px 4px;
+      padding: 4px 4px 14px 4px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .channel-card {
@@ -190,15 +216,51 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 20px;
-      padding: 14px 10px;
+      border-radius: 18px;
+      padding: 12px 10px;
       cursor: pointer;
       text-align: center;
-      border: 4px solid transparent;
+      border: 3px solid transparent;
       outline: none;
       transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
-      min-height: 145px;
+      min-height: 140px;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1280px) {
+      #view-home {
+        padding: 10px 18px 8px 18px;
+      }
+      .brand-title h1 {
+        font-size: 1.55rem;
+      }
+      .btn-pill {
+        padding: 5px 10px;
+        font-size: 0.88rem;
+      }
+      .btn-config-m3u {
+        padding: 5px 10px;
+        font-size: 0.86rem;
+      }
+      .clock-display {
+        font-size: 1.2rem;
+        padding: 4px 10px;
+      }
+      .channels-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 1060px) {
+      .channels-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
     }
 
     /* ESTADO DE FOCO PARA CONTROL REMOTO (D-PAD TV) */
@@ -1466,7 +1528,7 @@
     let previousIndex = null;
     let osdTimeout = null;
 
-    function showPlayerOsd(duration = 5000) {
+    function updateOsdContent() {
       if (!playerOsdBottom) return;
       const channel = CHANNELS[currentIndex];
       if (!channel) return;
@@ -1480,14 +1542,11 @@
       if (osdProgTime) osdProgTime.textContent = (epg.now.start && epg.now.end) ? `${epg.now.start} - ${epg.now.end}` : "En Vivo";
       if (osdProgProgress) osdProgProgress.style.width = `${epg.now.progress || 50}%`;
       if (osdProgNext) osdProgNext.textContent = epg.next.start ? `${epg.next.title} (${epg.next.start})` : epg.next.title;
+    }
 
-      playerOsdBottom.classList.remove("hidden");
-      clearTimeout(osdTimeout);
-      if (duration > 0) {
-        osdTimeout = setTimeout(() => {
-          playerOsdBottom.classList.add("hidden");
-        }, duration);
-      }
+    function showPlayerOsd() {
+      updateOsdContent();
+      resetOverlayTimer();
     }
     const btnSwitchSource = document.getElementById("btn-switch-source");
     const btnAspectRatio = document.getElementById("btn-aspect-ratio");
@@ -1584,9 +1643,14 @@
 
     function resetOverlayTimer() {
       playerOverlay.classList.remove("hidden");
+      if (playerOsdBottom) {
+        updateOsdContent();
+        playerOsdBottom.classList.remove("hidden");
+      }
       clearTimeout(overlayTimeout);
       overlayTimeout = setTimeout(() => {
         playerOverlay.classList.add("hidden");
+        if (playerOsdBottom) playerOsdBottom.classList.add("hidden");
       }, 5500);
     }
 
@@ -1596,6 +1660,7 @@
         btnBack.focus();
       } else {
         playerOverlay.classList.add("hidden");
+        if (playerOsdBottom) playerOsdBottom.classList.add("hidden");
       }
     }
 
@@ -2364,6 +2429,7 @@
         if (isPlayerOpen) {
           if (!playerOverlay.classList.contains("hidden")) {
             playerOverlay.classList.add("hidden");
+            if (playerOsdBottom) playerOsdBottom.classList.add("hidden");
             e.preventDefault();
             return;
           }
