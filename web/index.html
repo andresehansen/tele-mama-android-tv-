@@ -980,13 +980,34 @@
       if (gistUrl) {
         try {
           let fetchTarget = gistUrl.trim();
-          // Si el usuario ingresó un link de gist estándar (no raw), convertirlo o solicitarlo
-          if (fetchTarget.includes("gist.github.com") && !fetchTarget.includes("/raw")) {
-            fetchTarget = fetchTarget.endsWith("/") ? fetchTarget + "raw" : fetchTarget + "/raw";
+          let isApi = false;
+
+          // Soporte inteligente para TV: ingresar solo el ID del Gist, link corto o URL completa
+          if (!fetchTarget.startsWith("http://") && !fetchTarget.startsWith("https://")) {
+            fetchTarget = `https://api.github.com/gists/${fetchTarget}`;
+            isApi = true;
+          } else if (fetchTarget.includes("gist.github.com") && !fetchTarget.includes("/raw") && !fetchTarget.includes("api.github.com")) {
+            const parts = fetchTarget.split("/").filter(Boolean);
+            const possibleId = parts[parts.length - 1];
+            if (possibleId && /^[a-f0-9]{20,40}$/i.test(possibleId)) {
+              fetchTarget = `https://api.github.com/gists/${possibleId}`;
+              isApi = true;
+            } else {
+              fetchTarget = fetchTarget.endsWith("/") ? fetchTarget + "raw" : fetchTarget + "/raw";
+            }
           }
+
           const gistRes = await fetch(fetchTarget);
           if (gistRes.ok) {
-            const gistData = await gistRes.json();
+            let gistData = await gistRes.json();
+            if (isApi && gistData && gistData.files) {
+              const fileKey = Object.keys(gistData.files).find(k => k.endsWith(".json")) || Object.keys(gistData.files)[0];
+              if (fileKey && gistData.files[fileKey].content) {
+                try {
+                  gistData = JSON.parse(gistData.files[fileKey].content);
+                } catch (e) {}
+              }
+            }
             if (gistData && Array.isArray(gistData.canales)) {
               gistData.canales.forEach(canalExtra => {
                 gistCount++;
