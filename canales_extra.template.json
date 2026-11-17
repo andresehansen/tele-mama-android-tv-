@@ -15,21 +15,9 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (Flussonic Direct)",
+          "etiqueta": "Opción 1",
           "tipo": "web_hls",
           "url": "https://embed.saohgdassregions.com/embed2/espnar.php",
-          "referer": "https://www.anibaltv.net/"
-        },
-        {
-          "etiqueta": "Opción 2 (Puente Sur)",
-          "tipo": "web_bridge",
-          "url": "https://www.anibaltv.net/2020/07/espn-sur.html",
-          "referer": "https://ciberpooltv.blogspot.com/"
-        },
-        {
-          "etiqueta": "Opción 3 (Alternativa Web)",
-          "tipo": "web_bridge",
-          "url": "https://www.anibaltv.net/2026/06/espn-tv-en-vivo-online-y-gratis.html",
           "referer": "https://www.anibaltv.net/"
         }
       ]
@@ -41,16 +29,10 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (Flussonic Direct)",
+          "etiqueta": "Opción 1",
           "tipo": "web_hls",
           "url": "https://embed.ksdjugfssddeports.com/embed2/espn2.php",
           "referer": "https://www.anibaltv.net/"
-        },
-        {
-          "etiqueta": "Opción 2 (Puente CiberPool)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/p/espn-2.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
         }
       ]
     },
@@ -61,16 +43,10 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (Flussonic Direct)",
+          "etiqueta": "Opción 1",
           "tipo": "web_hls",
           "url": "https://embed.ksdjugfssddeports.com/embed2/espn3.php",
           "referer": "https://www.anibaltv.net/"
-        },
-        {
-          "etiqueta": "Opción 2 (Puente CiberPool)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/p/espn-3-en-vivo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
         }
       ]
     },
@@ -81,16 +57,10 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (Flussonic Direct)",
+          "etiqueta": "Opción 1",
           "tipo": "web_hls",
           "url": "https://embed.ksdjugfssddeports.com/embed2/espn4.php",
           "referer": "https://www.anibaltv.net/"
-        },
-        {
-          "etiqueta": "Opción 2 (ESPN Extra)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/p/espn-extra-en-vivo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
         }
       ]
     },
@@ -101,7 +71,7 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (Flussonic Direct)",
+          "etiqueta": "Opción 1",
           "tipo": "web_hls",
           "url": "https://embed.ksdjugfssddeports.com/embed2/espn5.php",
           "referer": "https://www.anibaltv.net/"
@@ -115,7 +85,7 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (Flussonic Direct)",
+          "etiqueta": "Opción 1",
           "tipo": "web_hls",
           "url": "https://embed.ksdjugfssddeports.com/embed2/espn6.php",
           "referer": "https://www.anibaltv.net/"
@@ -129,7 +99,7 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (Flussonic Direct)",
+          "etiqueta": "Opción 1",
           "tipo": "web_hls",
           "url": "https://embed.ksdjugfssddeports.com/embed2/espn7.php",
           "referer": "https://www.anibaltv.net/"
@@ -144,15 +114,9 @@
       "fuentes": [
         {
           "etiqueta": "Opción 1 (Pack Fútbol)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/02/espn-premium-futbol-en-directo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
-        },
-        {
-          "etiqueta": "Opción 2 (Alternativa)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/p/espn-premium-en-directo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/espnpremiumar.php",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     },
@@ -164,9 +128,9 @@
       "fuentes": [
         {
           "etiqueta": "Opción 1 (Pack Fútbol)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/02/tnt-sports-en-vivo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/tntsportsar.php",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     },
@@ -177,22 +141,22 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (AnibalTV)",
-          "tipo": "web_bridge",
-          "url": "https://www.anibaltv.net/2020/11/directv-sports.html",
+          "etiqueta": "Opción 1 (DSports)",
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdassregions.com/embed2/directvsports.php",
           "referer": "https://www.anibaltv.net/"
         },
         {
-          "etiqueta": "Opción 2 (CiberPool 1)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/07/en-vivo-directv-sports-online.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "etiqueta": "Opción 2 (DSports 2)",
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdassregions.com/embed2/directvsports2.php",
+          "referer": "https://www.anibaltv.net/"
         },
         {
-          "etiqueta": "Opción 3 (CiberPool 2)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/p/directv-sports-online.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "etiqueta": "Opción 3 (DSports+)",
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdassregions.com/embed2/directvsportsplus.php",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     },
@@ -203,16 +167,10 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (AnibalTV)",
-          "tipo": "web_bridge",
-          "url": "https://www.anibaltv.net/2020/06/tyc-sports-en-vivo.html",
+          "etiqueta": "Opción 1",
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdassregions.com/embed2/tycsports.php",
           "referer": "https://www.anibaltv.net/"
-        },
-        {
-          "etiqueta": "Opción 2 (CiberPool)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/03/tyc-sports-en-vivo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
         }
       ]
     },
@@ -223,22 +181,22 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (AnibalTV)",
-          "tipo": "web_bridge",
-          "url": "https://www.anibaltv.net/2026/06/fox-sports-en-vivo.html",
+          "etiqueta": "Opción 1 (Fox Sports)",
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/foxsports.php",
           "referer": "https://www.anibaltv.net/"
         },
         {
-          "etiqueta": "Opción 2 (CiberPool 1)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/07/en-vivo-fox-sports-argentina-online.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "etiqueta": "Opción 2 (Fox Sports 2)",
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/foxsports2.php",
+          "referer": "https://www.anibaltv.net/"
         },
         {
-          "etiqueta": "Opción 3 (CiberPool 2)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/p/fox-sports-ar.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "etiqueta": "Opción 3 (Fox Sports 3)",
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/foxsports3.php",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     },
@@ -249,16 +207,22 @@
       "prioridad": "primaria",
       "fuentes": [
         {
-          "etiqueta": "Opción 1 (AnibalTV)",
-          "tipo": "web_bridge",
-          "url": "https://www.anibaltv.net/2026/08/liga-profesional-de-futbol-argentina.html",
+          "etiqueta": "Opción 1 (ESPN Premium)",
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/espnpremiumar.php",
           "referer": "https://www.anibaltv.net/"
         },
         {
-          "etiqueta": "Opción 2 (CiberPool)",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2026/02/liga-profesional-de-futbol-de-argentina.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "etiqueta": "Opción 2 (TNT Sports)",
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/tntsportsar.php",
+          "referer": "https://www.anibaltv.net/"
+        },
+        {
+          "etiqueta": "Opción 3 (TyC Sports)",
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdassregions.com/embed2/tycsports.php",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     },
@@ -270,8 +234,8 @@
       "fuentes": [
         {
           "etiqueta": "Opción 1",
-          "tipo": "web_bridge",
-          "url": "https://www.anibaltv.net/2026/07/dazn-la-liga-en-directo.html",
+          "tipo": "web_hls",
+          "url": "https://embed.ksdjugfssddeports.com/embed2/daznf1.php",
           "referer": "https://www.anibaltv.net/"
         }
       ]
@@ -284,9 +248,9 @@
       "fuentes": [
         {
           "etiqueta": "Respaldo Web",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/04/telefe-en-vivo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdasregions.fun/embed2/telefe.html",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     },
@@ -298,23 +262,9 @@
       "fuentes": [
         {
           "etiqueta": "Respaldo Web",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/02/eltrece-tv.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
-        }
-      ]
-    },
-    {
-      "id": "elnueve",
-      "nombre": "El Nueve",
-      "categoria": "Aire y Noticias",
-      "prioridad": "secundaria",
-      "fuentes": [
-        {
-          "etiqueta": "Respaldo Web",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/02/elnueve-tv-buenos-aires-arg.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdasregions.fun/embed2/eltrece.html",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     },
@@ -326,9 +276,23 @@
       "fuentes": [
         {
           "etiqueta": "Respaldo Web",
-          "tipo": "web_bridge",
-          "url": "https://ciberpooltv.blogspot.com/2023/05/america-tv-en-vivo.html?m=0",
-          "referer": "https://ciberpooltv.blogspot.com/"
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdasregions.fun/embed2/americatv.html",
+          "referer": "https://www.anibaltv.net/"
+        }
+      ]
+    },
+    {
+      "id": "tv_publica",
+      "nombre": "TV Pública",
+      "categoria": "Aire y Noticias",
+      "prioridad": "secundaria",
+      "fuentes": [
+        {
+          "etiqueta": "Respaldo Web",
+          "tipo": "web_hls",
+          "url": "https://embed.saohgdasregions.fun/embed2/tvpublica.html",
+          "referer": "https://www.anibaltv.net/"
         }
       ]
     }

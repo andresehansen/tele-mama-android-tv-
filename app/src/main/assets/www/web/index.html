@@ -1318,6 +1318,33 @@
       playCurrentChannelSource();
     }
 
+        function normalizeEmbedUrl(rawUrl) {
+      if (!rawUrl) return rawUrl;
+      const u = rawUrl.toLowerCase();
+      // Si ya es un reproductor embed directo, se mantiene tal cual
+      if (u.includes("/embed2/")) return rawUrl;
+
+      // Normalización de enlaces de páginas puente (Blogger / AnibalTV) a sus reproductores directos limpios
+      if (u.includes("espn-3")) return "https://embed.ksdjugfssddeports.com/embed2/espn3.php";
+      if (u.includes("espn-2")) return "https://embed.ksdjugfssddeports.com/embed2/espn2.php";
+      if (u.includes("espn-4") || u.includes("espn-extra")) return "https://embed.ksdjugfssddeports.com/embed2/espn4.php";
+      if (u.includes("espn-5")) return "https://embed.ksdjugfssddeports.com/embed2/espn5.php";
+      if (u.includes("espn-6")) return "https://embed.ksdjugfssddeports.com/embed2/espn6.php";
+      if (u.includes("espn-7")) return "https://embed.ksdjugfssddeports.com/embed2/espn7.php";
+      if (u.includes("espn-premium") || u.includes("espnpremiumar")) return "https://embed.ksdjugfssddeports.com/embed2/espnpremiumar.php";
+      if (u.includes("espn-sur") || (u.includes("espn") && !u.includes("espn-") && !u.includes("espnpremiumar"))) return "https://embed.saohgdassregions.com/embed2/espnar.php";
+      if (u.includes("tnt-sports") || u.includes("tntsportsar")) return "https://embed.ksdjugfssddeports.com/embed2/tntsportsar.php";
+      if (u.includes("directv-sports") || u.includes("directvsports")) return "https://embed.saohgdassregions.com/embed2/directvsports.php";
+      if (u.includes("tyc-sports") || u.includes("tycsports")) return "https://embed.saohgdassregions.com/embed2/tycsports.php";
+      if (u.includes("fox-sports") || u.includes("foxsports")) return "https://embed.ksdjugfssddeports.com/embed2/foxsports.php";
+      if (u.includes("dazn")) return "https://embed.ksdjugfssddeports.com/embed2/daznf1.php";
+      if (u.includes("telefe")) return "https://embed.saohgdasregions.fun/embed2/telefe.html";
+      if (u.includes("eltrece")) return "https://embed.saohgdasregions.fun/embed2/eltrece.html";
+      if (u.includes("america")) return "https://embed.saohgdasregions.fun/embed2/americatv.html";
+      if (u.includes("tvpublica") || u.includes("tv-publica")) return "https://embed.saohgdasregions.fun/embed2/tvpublica.html";
+      return rawUrl;
+    }
+
     function playCurrentChannelSource() {
       clearTimeout(autoFallbackTimer);
       const channel = MERGED_CHANNELS[currentIndex];
@@ -1329,11 +1356,15 @@
 
       showLoading(`Cargando ${channel.name} (${source.label || "Opción 1"})...`);
 
-      // Configurar temporizador de Auto-Fallback (4 segundos)
+      const sourceType = source.tipo || source.type || "hls";
+      const isEmbedOrBridge = (sourceType === "web_hls" || sourceType === "web_bridge" || sourceType === "embed");
+      const fallbackMs = isEmbedOrBridge ? 9500 : 4500;
+
+      // Configurar temporizador de Auto-Fallback (9.5s para reproductores web y 4.5s para HLS directo)
       autoFallbackTimer = setTimeout(() => {
-        console.warn(`[Auto-Fallback] Timeout de 4s en señal de ${channel.name}, saltando a siguiente fuente...`);
+        console.warn(`[Auto-Fallback] Timeout en señal de ${channel.name}, saltando a siguiente fuente...`);
         switchChannelSourceAuto();
-      }, 4000);
+      }, fallbackMs);
 
       // Limpiar reproductores
       if (hlsInstance) {
@@ -1353,7 +1384,7 @@
           // Extraer .m3u8 Flussonic dinámico con headers en segundo plano nativo
           video.style.display = "none";
           iframe.style.display = "none";
-          window.AndroidBridge.resolveAndPlayWebHls(source.url, source.referer || "", sourceType);
+          window.AndroidBridge.resolveAndPlayWebHls(normalizeEmbedUrl(source.url), source.referer || "https://www.anibaltv.net/", sourceType);
           return;
         } else if (sourceType === "telefe-token") {
           // Telefe token API
@@ -1388,7 +1419,7 @@
       if (sourceType === "web_hls" || sourceType === "web_bridge" || sourceType === "embed") {
         video.style.display = "none";
         iframe.style.display = "block";
-        iframe.src = source.url;
+        iframe.src = normalizeEmbedUrl(source.url);
         iframe.onload = () => {
           hideLoading();
           clearTimeout(autoFallbackTimer);
@@ -1456,7 +1487,7 @@
       const source = channel.sources[channel.currentSourceIndex || 0];
       video.style.display = "none";
       iframe.style.display = "block";
-      iframe.src = source.url;
+      iframe.src = normalizeEmbedUrl(source.url);
       hideLoading();
       clearTimeout(autoFallbackTimer);
     };
