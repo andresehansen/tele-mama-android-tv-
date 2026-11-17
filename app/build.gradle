@@ -7,13 +7,34 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.mitele.tv"
         minSdk 21
         targetSdk 34
         versionCode 1
         versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    flavorDimensions "version"
+    productFlavors {
+        standard {
+            dimension "version"
+            applicationId "com.mitele.tv"
+            manifestPlaceholders = [appName: "AndyTV"]
+            buildConfigField "String", "REMOTE_APP_URL", '"https://andresehansen.github.io/tele-mama-android-tv-/"'
+            buildConfigField "String", "LOCAL_FALLBACK_URL", '"file:///android_asset/www/index.html"'
+        }
+        plus {
+            dimension "version"
+            applicationId "com.mitele.tv.plus"
+            manifestPlaceholders = [appName: "AndyTV Plus"]
+            buildConfigField "String", "REMOTE_APP_URL", '"https://andresehansen.github.io/tele-mama-android-tv-/web/"'
+            buildConfigField "String", "LOCAL_FALLBACK_URL", '"file:///android_asset/www/web/index.html"'
+        }
     }
 
     buildTypes {

@@ -21,6 +21,11 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public void resolveAndPlayWebHls(String url, String referer, String type) {
+        activity.resolveAndPlayWebHls(url, referer, type);
+    }
+
+    @JavascriptInterface
     public void playNativeHls(String url) {
         activity.playNativeHlsWithHeaders(url, null);
     }

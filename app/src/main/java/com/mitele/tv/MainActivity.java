@@ -62,8 +62,8 @@ public class MainActivity extends Activity {
 
     private static final String TAG = "AndyTV";
     // URL remota en GitHub Pages: permite que la app se actualice sola en la TV sin reinstalar el APK
-    private static final String REMOTE_APP_URL = "https://andresehansen.github.io/tele-mama-android-tv-/";
-    private static final String LOCAL_FALLBACK_URL = "file:///android_asset/www/index.html";
+    private static final String REMOTE_APP_URL = BuildConfig.REMOTE_APP_URL;
+    private static final String LOCAL_FALLBACK_URL = BuildConfig.LOCAL_FALLBACK_URL;
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
     // Lista ligera de dominios de anuncios y popups bloqueados a nivel nativo (acelera carga de embeds deportivos)
@@ -337,6 +337,34 @@ public class MainActivity extends Activity {
         } catch (Throwable t) {
             Log.e(TAG, "Error inicializando ExoPlayer", t);
         }
+    }
+
+    public void resolveAndPlayWebHls(String url, String referer, String type) {
+        runOnUiThread(() -> {
+            Toast.makeText(this, "Sintonizando señal deportiva...", Toast.LENGTH_SHORT).show();
+        });
+        DynamicStreamResolver.resolveStreamAsync(url, referer, type, result -> {
+            runOnUiThread(() -> {
+                if (result.success && result.m3u8Url != null) {
+                    Log.d(TAG, "Stream deportivo resuelto: " + result.m3u8Url);
+                    playNativeHlsWithHeaders(result.m3u8Url, result.headersJson);
+                    if (webView != null) {
+                        webView.evaluateJavascript("if(window.onDynamicStreamSuccess) window.onDynamicStreamSuccess('" + result.m3u8Url + "');", null);
+                    }
+                } else if (result.isFallbackWeb) {
+                    Log.d(TAG, "Señal requiere reproductor web de respaldo");
+                    if (webView != null) {
+                        webView.evaluateJavascript("if(window.onDynamicStreamFallbackWeb) window.onDynamicStreamFallbackWeb();", null);
+                    }
+                } else {
+                    Log.w(TAG, "Fallo al resolver stream deportivo: " + result.error);
+                    if (webView != null) {
+                        String safeErr = (result.error != null ? result.error.replace("'", "\\'") : "Error");
+                        webView.evaluateJavascript("if(window.onDynamicStreamError) window.onDynamicStreamError('" + safeErr + "');", null);
+                    }
+                }
+            });
+        });
     }
 
     public void playNativeHls(String url) {

@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AndyTV Plus - TV en Vivo y Deportes</title>
+  
+  <meta name="referrer" id="meta-referrer" content="no-referrer-when-downgrade">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <meta name="theme-color" content="#080c14">
+
+  <!-- Hls.js local con fallback a CDN jsDelivr -->
+  <script src="hls.min.js"></script>
+  <script>
+    if (typeof Hls === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"><\/script>');
+    }
+  </script>
+  <!-- Guía EPG y Canales base -->
+  <script src="epg.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #080c14;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* VISTA DE INICIO */
+    #view-home {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100vh;
+      padding: 14px 28px 12px 28px;
+      width: 100vw;
+      max-width: 100vw;
+      box-sizing: border-box;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    header.app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+      gap: 10px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .brand-title h1 {
+      font-size: 1.85rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-plus {
+      background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%);
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 900;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.6);
+    }
+
+    .badge-live {
+      background: #e11d48;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .category-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .category-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .btn-pill {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.94rem;
+      font-weight: 800;
+      cursor: pointer;
+      outline: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .btn-pill:focus, .btn-pill:hover {
+      outline: none;
+      background: #facc15;
+      color: #000;
+      border-color: #ffffff;
+      transform: scale(1.05);
+      box-shadow: 0 0 16px rgba(250, 204, 21, 0.6);
+    }
+
+    .btn-pill.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn-config-action {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      outline: none;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-config-action:focus, .btn-config-action:hover {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+      transform: scale(1.05);
+    }
+
+    .btn-gist-badge {
+      background: #8b5cf6;
+      border-color: #a78bfa;
+      color: #fff;
+    }
+    .btn-gist-badge:focus, .btn-gist-badge:hover {
+      background: #7c3aed;
+      border-color: #c4b5fd;
+    }
+
+    .clock-display {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #facc15;
+      font-variant-numeric: tabular-nums;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 5px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(250, 204, 21, 0.3);
+      flex-shrink: 0;
+    }
+
+    /* Grilla de canales */
+    .channels-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      margin: 10px 0 6px 0;
+      padding: 6px 6px 12px 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(250, 204, 21, 0.4) transparent;
+      scroll-behavior: smooth;
+    }
+
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      align-content: start;
+    }
+
+    @media (max-width: 768px) {
+      .channels-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 10px;
+      }
+      .brand-title h1 { font-size: 1.3rem; }
+      #view-home { padding: 8px 12px; }
+    }
+
+    .channel-card {
+      position: relative;
+      border-radius: 16px;
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      outline: none;
+      min-height: 125px;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.75);
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .channel-card:focus, .channel-card:hover {
+      outline: none;
+      transform: scale(1.05);
+      border-color: #facc15 !important;
+      box-shadow: 0 0 24px rgba(250, 204, 21, 0.8), 0 8px 30px rgba(0, 0, 0, 0.9);
+      z-index: 10;
+    }
+
+    .channel-number-tag {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #94a3b8;
+    }
+
+    .source-type-tag {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.4);
+      color: #f8fafc;
+      border: 1px solid rgba(255,255,255,0.2);
+      text-transform: uppercase;
+    }
+
+    .fav-star-badge {
+      position: absolute;
+      top: 10px;
+      right: 68px;
+      font-size: 0.95rem;
+    }
+
+    .channel-header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .logo-container {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.3);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .logo-container svg, .logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .channel-id-info {
+      min-width: 0;
+      flex: 1;
+    }
+    .channel-title {
+      font-size: 1.18rem;
+      font-weight: 900;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .channel-subtitle {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .channel-epg-preview {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.78rem;
+    }
+    .epg-now-header {
+      display: flex;
+      justify-content: space-between;
+      color: #facc15;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .epg-now-title {
+      color: #e2e8f0;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Temas para cards deportivas */
+    .card-deportes { background: linear-gradient(135deg, #064e3b 0%, #047857 60%, #10b981 100%); }
+    .card-espn { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 60%, #dc2626 100%); }
+    .card-tntsports { background: linear-gradient(135deg, #3b0764 0%, #701a75 55%, #f43f5e 100%); }
+    .card-foxsports { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #f59e0b 100%); }
+    .card-dsports { background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 60%, #38bdf8 100%); }
+    .card-tycsports { background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 55%, #38bdf8 100%); }
+    .card-fifaplus { background: linear-gradient(135deg, #0369a1 0%, #0284c7 60%, #eab308 100%); }
+    .card-tn { background: linear-gradient(135deg, #0b2545 0%, #134074 60%, #e65c00 100%); }
+    .card-telefe { background: linear-gradient(135deg, #1e3a8a 0%, #047857 50%, #b91c1c 100%); }
+    .card-c5n { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 60%, #991b1b 100%); }
+    .card-eltrece { background: linear-gradient(135deg, #3b0764 0%, #ea580c 60%, #facc15 100%); }
+    .card-elnueve { background: linear-gradient(135deg, #500724 0%, #831843 60%, #f43f5e 100%); }
+    .card-americatv { background: linear-gradient(135deg, #0369a1 0%, #c2410c 60%, #eab308 100%); }
+    .card-a24 { background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 50%, #b91c1c 100%); }
+    .card-tvpublica { background: linear-gradient(135deg, #075985 0%, #0284c7 50%, #f59e0b 100%); }
+    .card-lnmas { background: linear-gradient(135deg, #091e3a 0%, #0f2b48 60%, #38bdf8 100%); }
+    .card-cronica { background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 60%, #dc2626 100%); }
+    .card-canalrural { background: linear-gradient(135deg, #14532d 0%, #166534 60%, #84cc16 100%); }
+    .card-canal26 { background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 60%, #ef4444 100%); }
+    .card-quieromusica { background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 60%, #c084fc 100%); }
+
+    /* Barra inferior de estado */
+    footer.app-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+    .footer-hints {
+      display: flex;
+      gap: 16px;
+    }
+    .footer-hint-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    /* VISTA DE REPRODUCTOR (100% PANTALLA) */
+    #view-player {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000000;
+      z-index: 1000;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      overflow: hidden;
+    }
+
+    video#tv-video, iframe#tv-iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      border: none;
+    }
+
+    /* Overlay interactivo del reproductor */
+    .player-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 32px;
+      background: linear-gradient(180deg, rgba(8, 12, 20, 0.85) 0%, rgba(8, 12, 20, 0) 30%, rgba(8, 12, 20, 0) 70%, rgba(8, 12, 20, 0.95) 100%);
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      pointer-events: auto;
+      z-index: 100;
+    }
+    .player-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .overlay-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-controls-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-tv-control {
+      background: rgba(15, 23, 42, 0.85);
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      cursor: pointer;
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-tv-control:focus, .btn-tv-control:hover {
+      background: #facc15;
+      color: #000;
+      border-color: #ffffff;
+      transform: scale(1.06);
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.8);
+    }
+    .btn-switch-source {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+
+    /* Barra lateral vertical de canales en el reproductor */
+    .overlay-middle {
+      position: absolute;
+      top: 76px;
+      bottom: 134px;
+      left: 32px;
+      width: 260px;
+      max-height: calc(100vh - 220px);
+      display: flex;
+      flex-direction: column;
+      pointer-events: auto;
+      z-index: 110;
+    }
+    .channel-menu-label {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #facc15;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+      margin-bottom: 8px;
+    }
+    .channel-selector-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(250, 204, 21, 0.5) transparent;
+      scroll-behavior: smooth;
+    }
+    .btn-bar-channel {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 9px 14px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 1.05rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      outline: none;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .btn-bar-channel:focus, .btn-bar-channel:hover {
+      transform: scale(1.04) translateX(6px);
+      border-color: #facc15 !important;
+      background: rgba(30, 41, 59, 0.95);
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.9);
+    }
+    .btn-bar-channel.active {
+      border: 3px solid #facc15 !important;
+      background: rgba(250, 204, 21, 0.25);
+    }
+
+    /* Barra OSD Inferior con EPG */
+    .player-osd-bottom {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+    .osd-channel-badge {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #facc15;
+      min-width: 48px;
+      text-align: center;
+    }
+    .osd-details {
+      flex: 1;
+      min-width: 0;
+    }
+    .osd-row-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 4px;
+    }
+    .osd-channel-name {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+    .osd-program-now {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #38bdf8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .osd-program-time {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-left: auto;
+    }
+    .osd-progress-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 4px 0;
+    }
+    .osd-progress-bar {
+      height: 100%;
+      background: #facc15;
+      width: 40%;
+    }
+    .osd-row-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .osd-program-next {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Modal / Diálogo para Secret Gist y BYOL */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #0f172a;
+      border: 2px solid #8b5cf6;
+      border-radius: 20px;
+      padding: 24px 28px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+    }
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #f8fafc;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-desc {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .modal-input {
+      width: 100%;
+      background: #020617;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      color: #ffffff;
+      outline: none;
+      margin-bottom: 16px;
+    }
+    .modal-input:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.5);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Notificación de carga / estado */
+    .player-loader {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #38bdf8;
+      border-radius: 16px;
+      padding: 16px 24px;
+      align-items: center;
+      gap: 12px;
+      z-index: 120;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- PANTALLA PRINCIPAL: GRILLA Y MENÚ -->
+  <section id="view-home">
+    <header class="app-header">
+      <div class="brand-title">
+        <h1>AndyTV <span class="badge-plus">PLUS</span></h1>
+        <span class="badge-live">EN VIVO</span>
+      </div>
+
+      <nav class="category-pills" id="category-pills" role="tablist">
+        <button class="btn-pill active" id="pill-all" data-category="all" tabindex="0">Todos</button>
+        <button class="btn-pill" id="pill-deportes" data-category="deportes" tabindex="0">⚽ Deportes</button>
+        <button class="btn-pill" id="pill-aire" data-category="aire" tabindex="0">Aire</button>
+        <button class="btn-pill" id="pill-noticias" data-category="noticias" tabindex="0">Noticias</button>
+        <button class="btn-pill" id="pill-fav" data-category="favoritos" tabindex="0">⭐ Favoritos</button>
+      </nav>
+
+      <div class="header-right">
+        <button class="btn-config-action btn-gist-badge" id="btn-open-gist-modal" tabindex="0">
+          ⚙️ Fuentes Extra
+        </button>
+        <button class="btn-config-action" id="btn-refresh-channels" tabindex="0">
+          🔄 Actualizar
+        </button>
+        <div class="clock-display" id="app-clock">--:--</div>
+      </div>
+    </header>
+
+    <main class="channels-scroll-area" id="channels-scroll-area">
+      <div class="channels-grid" id="channels-container">
+        <!-- Renderizado dinámicamente -->
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-hints">
+        <span class="footer-hint-badge">▲ ▼ ◄ ► Navegar</span>
+        <span class="footer-hint-badge">OK Sintonizar</span>
+        <span class="footer-hint-badge">CH +/- Zapping</span>
+        <span class="footer-hint-badge">Atrás Salir</span>
+      </div>
+      <div id="status-source-summary">🟢 Cargando canales verificados...</div>
+    </footer>
+  </section>
+
+  <!-- PANTALLA DEL REPRODUCTOR (100% PANTALLA COMPLETA) -->
+  <section id="view-player">
+    <div class="video-container" id="video-container">
+      <video id="tv-video" playsinline></video>
+      <iframe id="tv-iframe"
+        sandbox="allow-scripts allow-same-origin allow-presentation"
+        referrerpolicy="no-referrer-when-downgrade"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        style="display: none;">
+      </iframe>
+
+      <div class="player-loader" id="player-loader">
+        <div class="spinner"></div>
+        <span id="player-loader-text">Sintonizando...</span>
+      </div>
+
+      <!-- Overlay superior e inferior -->
+      <div class="player-overlay" id="player-overlay">
+        <div class="overlay-top">
+          <div class="top-controls-left">
+            <button class="btn-tv-control" id="btn-player-back" tabindex="0">
+              ⬅ Inicio
+            </button>
+            <button class="btn-tv-control btn-switch-source" id="btn-player-switch-source" tabindex="0">
+              📡 Señal: Opción 1
+            </button>
+            <button class="btn-tv-control" id="btn-player-fav" tabindex="0">
+              ☆ Favorito
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="badge-live">VIVO</span>
+            <span id="player-current-channel-title" style="font-size: 1.25rem; font-weight: 900;">Canal</span>
+          </div>
+        </div>
+
+        <!-- Barra lateral vertical de canales con centrado automático -->
+        <div class="overlay-middle">
+          <span class="channel-menu-label">📺 Guía Rápida</span>
+          <div class="channel-selector-bar" id="channel-selector-bar">
+            <!-- Renderizado dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Barra OSD Inferior con EPG -->
+        <div class="player-osd-bottom" id="player-osd-bottom">
+          <div class="osd-channel-badge" id="osd-channel-num">1</div>
+          <div class="osd-details">
+            <div class="osd-row-top">
+              <span class="osd-channel-name" id="osd-channel-name">TN</span>
+              <span class="osd-program-now" id="osd-prog-title">Transmisión en Vivo</span>
+              <span class="osd-program-time" id="osd-prog-time">--:--</span>
+            </div>
+            <div class="osd-progress-track">
+              <div class="osd-progress-bar" id="osd-prog-progress" style="width: 50%;"></div>
+            </div>
+            <div class="osd-row-bottom">
+              <span class="osd-program-next" id="osd-prog-next">A continuación: En vivo</span>
+              <span id="osd-source-tag" style="color: #38bdf8; font-weight: 700;">Opción 1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL: CONFIGURAR SECRET GIST (BYOL) -->
+  <div class="modal-backdrop" id="modal-gist-config">
+    <div class="modal-card">
+      <h2 class="modal-title">⚙️ Canales Extra y Deportes (Secret Gist)</h2>
+      <p class="modal-desc">
+        Pegá la URL Raw o el ID de tu <b>GitHub Secret Gist privado</b> con tu lista <code>canales_extra.json</code>.
+        La app cargará los canales deportivos y fuentes alternativas de respaldo directamente en tu dispositivo sin intermediarios.
+      </p>
+      <input type="text" class="modal-input" id="input-gist-url" placeholder="https://gist.githubusercontent.com/.../raw/canales_extra.json">
+      <div id="gist-status-message" style="font-size: 0.88rem; margin-bottom: 14px; color: #94a3b8;"></div>
+      <div class="modal-actions">
+        <button class="btn-tv-control" id="btn-gist-cancel" style="background: rgba(255,255,255,0.1);">Cancelar</button>
+        <button class="btn-tv-control" id="btn-gist-unlink" style="background: #e11d48; display: none;">Desvincular</button>
+        <button class="btn-tv-control" id="btn-gist-save" style="background: #8b5cf6; border-color: #a78bfa;">Guardar y Vincular</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       ANDYTV PLUS - MOTOR MULTI-FUENTE Y BYOL
+       ========================================================================== */
+
+    // Registro PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
+      });
+    }
+
+    // Detección de entorno Android TV Wrapper vs Navegador Web
+    const isAndroidApp = !!(window.AndroidBridge && typeof window.AndroidBridge.playNativeHlsWithHeaders === "function");
+    console.log("[AndyTV Plus] Entorno detectado:", isAndroidApp ? "Android TV Nativo (Media3/ExoPlayer)" : "Navegador Web / PWA (hls.js)");
+
+    const CLOUDFLARE_WORKER_URL = "https://mi-tele-proxy.andresehansen.workers.dev";
+    function getProxiedUrl(targetUrl) {
+      if (!CLOUDFLARE_WORKER_URL || !targetUrl) return targetUrl;
+      const base = CLOUDFLARE_WORKER_URL.endsWith("/") ? CLOUDFLARE_WORKER_URL.slice(0, -1) : CLOUDFLARE_WORKER_URL;
+      return `${base}/?url=${encodeURIComponent(targetUrl)}`;
+    }
+
+    // Reloj
+    function updateClock() {
+      const clockEl = document.getElementById("app-clock");
+      if (!clockEl) return;
+      const now = new Date();
+      clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Estado principal de canales
+    let BASE_CHANNELS = [];
+    let MERGED_CHANNELS = [];
+    let currentCategory = "all";
+    let currentIndex = 0;
+    let hlsInstance = null;
+    let autoFallbackTimer = null;
+    let overlayTimer = null;
+
+    // Almacenamiento local
+    const STORAGE_GIST_KEY = "andytv_plus_gist_url";
+    const STORAGE_FAVS_KEY = "andytv_plus_favs";
+
+    function getSavedGistUrl() {
+      try { return localStorage.getItem(STORAGE_GIST_KEY) || ""; } catch (e) { return ""; }
+    }
+    function saveGistUrl(url) {
+      try { localStorage.setItem(STORAGE_GIST_KEY, url); } catch (e) {}
+    }
+    function getFavorites() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_FAVS_KEY) || "[]"); } catch (e) { return []; }
+    }
+    function toggleFavorite(id) {
+      let favs = getFavorites();
+      if (favs.includes(id)) {
+        favs = favs.filter(f => f !== id);
+      } else {
+        favs.push(id);
+      }
+      try { localStorage.setItem(STORAGE_FAVS_KEY, JSON.stringify(favs)); } catch (e) {}
+      renderChannelsGrid();
+      updateFavButtonState();
+    }
+
+    // Centrado de la barra lateral vertical
+    const channelBar = document.getElementById("channel-selector-bar");
+    function scrollSideButtonToCenter(btn, smooth = true) {
+      if (!btn) return;
+      try {
+        btn.scrollIntoView({
+          block: "center",
+          inline: "nearest",
+          behavior: smooth ? "smooth" : "auto"
+        });
+      } catch (e) {
+        if (channelBar) {
+          const barRect = channelBar.getBoundingClientRect();
+          const btnRect = btn.getBoundingClientRect();
+          const offset = (btnRect.top - barRect.top) - (channelBar.clientHeight / 2) + (btn.clientHeight / 2);
+          channelBar.scrollTop += offset;
+        }
+      }
+    }
+
+    /* ==========================================================================
+       CARGA Y FUSIÓN DE CANALES: BASE + GIST + IPTV-ORG (WHITELIST)
+       ========================================================================== */
+
+    const IPTV_ORG_WHITELIST = [
+      "Telefe", "El Trece", "eltrece", "El Nueve", "elnueve", "América", "America TV",
+      "TV Pública", "Televisión Pública", "Net TV", "Bravo TV",
+      "TN", "Todo Noticias", "C5N", "Crónica", "Cronica TV", "Canal 26", "LN+", "La Nación+", "A24"
+    ];
+
+    async function loadAllChannels() {
+      const statusEl = document.getElementById("status-source-summary");
+      if (statusEl) statusEl.textContent = "⏳ Cargando señales...";
+
+      try {
+        // 1. Cargar canales base
+        const res = await fetch("channels.json?t=" + Date.now()).catch(() => fetch("../channels.json?t=" + Date.now()));
+        if (res.ok) {
+          BASE_CHANNELS = await res.json();
+        } else {
+          BASE_CHANNELS = [];
+        }
+      } catch (e) {
+        console.warn("Fallo cargando channels.json base:", e);
+      }
+
+      // Copia de trabajo
+      let merged = JSON.parse(JSON.stringify(BASE_CHANNELS));
+
+      // Normalizar fuentes base
+      merged.forEach(ch => {
+        ch.currentSourceIndex = 0;
+        if (!ch.sources || ch.sources.length === 0) {
+          ch.sources = [{
+            label: "Opción 1 (Oficial)",
+            type: ch.type || "hls",
+            url: ch.hlsUrl || "",
+            ytVideoId: ch.ytVideoId
+          }];
+        } else {
+          ch.sources.forEach((s, idx) => {
+            if (!s.label) s.label = `Opción ${idx + 1}`;
+          });
+        }
+      });
+
+      // 2. Cargar Secret Gist si está configurado
+      const gistUrl = getSavedGistUrl();
+      let gistCount = 0;
+      if (gistUrl) {
+        try {
+          let fetchTarget = gistUrl.trim();
+          // Si el usuario ingresó un link de gist estándar (no raw), convertirlo o solicitarlo
+          if (fetchTarget.includes("gist.github.com") && !fetchTarget.includes("/raw")) {
+            fetchTarget = fetchTarget.endsWith("/") ? fetchTarget + "raw" : fetchTarget + "/raw";
+          }
+          const gistRes = await fetch(fetchTarget);
+          if (gistRes.ok) {
+            const gistData = await gistRes.json();
+            if (gistData && Array.isArray(gistData.canales)) {
+              gistData.canales.forEach(canalExtra => {
+                gistCount++;
+                // Normalizar fuentes del gist
+                const incomingSources = (canalExtra.fuentes || []).map((f, fIdx) => ({
+                  label: f.etiqueta || `Opción ${fIdx + 1}`,
+                  tipo: f.tipo || "web_hls",
+                  type: f.tipo || "web_hls",
+                  url: f.url,
+                  referer: f.referer || ""
+                }));
+
+                // Comprobar si el canal ya existe en la grilla base
+                const existing = merged.find(c => 
+                  c.id === canalExtra.id || 
+                  c.name.toLowerCase() === canalExtra.nombre.toLowerCase()
+                );
+
+                if (existing) {
+                  // NO duplicar: agregar como fuentes secundarias / terciarias
+                  incomingSources.forEach(s => {
+                    const alreadyHas = existing.sources.some(src => src.url === s.url);
+                    if (!alreadyHas) {
+                      existing.sources.push(s);
+                    }
+                  });
+                } else {
+                  // Canal nuevo (ej. Deportes)
+                  const newChannel = {
+                    id: canalExtra.id,
+                    number: merged.length + 1,
+                    category: (canalExtra.categoria || "deportes").toLowerCase(),
+                    name: canalExtra.nombre,
+                    subtitle: canalExtra.categoria || "Deportes",
+                    themeClass: `card-${canalExtra.id.replace(/[^a-z0-9]/g, '')} card-deportes`,
+                    type: incomingSources[0] ? incomingSources[0].tipo : "web_hls",
+                    currentSourceIndex: 0,
+                    sources: incomingSources,
+                    logoSvg: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#1e293b"/><text x="50" y="55" font-family="sans-serif" font-weight="900" font-size="20" fill="#38bdf8" text-anchor="middle">${canalExtra.nombre.slice(0, 7)}</text><text x="50" y="78" font-family="sans-serif" font-weight="800" font-size="12" fill="#facc15" text-anchor="middle">DEPORTES</text></svg>`
+                  };
+                  merged.push(newChannel);
+                }
+              });
+            }
+          }
+        } catch (err) {
+          console.warn("[AndyTV Plus] Error leyendo Gist:", err);
+        }
+      }
+
+      // 3. Filtrar e inyectar fuentes de IPTV-ORG (Whitelist estricta de 26 señales)
+      try {
+        const iptvRes = await fetch("https://iptv-org.github.io/iptv/countries/ar.m3u", { cache: "no-store" }).catch(() => null);
+        if (iptvRes && iptvRes.ok) {
+          const m3uText = await iptvRes.text();
+          const lines = m3uText.split("\n");
+          let lastExtInf = "";
+          let lastDisplayName = "";
+
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line.startsWith("#EXTINF:")) {
+              lastExtInf = line;
+              const cIdx = line.lastIndexOf(",");
+              lastDisplayName = cIdx >= 0 ? line.slice(cIdx + 1).trim() : "";
+            } else if (line.startsWith("http") && lastExtInf) {
+              // Validar contra la whitelist estricta
+              const matchedKeyword = IPTV_ORG_WHITELIST.find(w => {
+                const rx = new RegExp(`(^|[^a-zA-Z0-9])${w}([^a-zA-Z0-9]|$)`, "i");
+                return rx.test(lastDisplayName) || rx.test(lastExtInf);
+              });
+
+              // Descartar repetidoras provinciales de Telefe
+              const isRepeater = /\b(salta|tucum[aá]n|rosario|c[oó]rdoba|neuqu[eé]n|mar del plata|bah[ií]a blanca)\b/i.test(lastDisplayName);
+
+              if (matchedKeyword && !isRepeater) {
+                // Asociar al canal correspondiente
+                const targetChannel = merged.find(c => {
+                  const rx = new RegExp(`(^|[^a-zA-Z0-9])${matchedKeyword}([^a-zA-Z0-9]|$)`, "i");
+                  return rx.test(c.name) || rx.test(c.id);
+                });
+
+                if (targetChannel) {
+                  const already = targetChannel.sources.some(s => s.url === line);
+                  if (!already) {
+                    targetChannel.sources.push({
+                      label: `Opción ${targetChannel.sources.length + 1} (IPTV-ORG)`,
+                      tipo: "direct_hls",
+                      type: "hls",
+                      url: line
+                    });
+                  }
+                }
+              }
+              lastExtInf = "";
+            }
+          }
+        }
+      } catch (err) {
+        console.log("IPTV-ORG sync omitido:", err);
+      }
+
+      MERGED_CHANNELS = merged;
+      renderChannelsGrid();
+      renderChannelBar();
+
+      if (statusEl) {
+        statusEl.textContent = gistCount > 0 
+          ? `🟢 ${MERGED_CHANNELS.length} canales activos (+${gistCount} de Secret Gist)`
+          : `🟢 ${MERGED_CHANNELS.length} canales verificados`;
+      }
+    }
+
+    /* ==========================================================================
+       RENDERIZADO DE GRILLA Y FILTRADO POR CATEGORÍAS
+       ========================================================================== */
+
+    const container = document.getElementById("channels-container");
+    const pills = document.querySelectorAll(".btn-pill");
+
+    function renderChannelsGrid() {
+      if (!container) return;
+      container.innerHTML = "";
+      const favs = getFavorites();
+
+      const filtered = MERGED_CHANNELS.filter(ch => {
+        if (currentCategory === "all") return true;
+        if (currentCategory === "favoritos") return favs.includes(ch.id);
+        return ch.category === currentCategory;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8; font-size: 1.2rem;">No hay canales en esta sección.</div>`;
+        return;
+      }
+
+      filtered.forEach((channel) => {
+        const globalIndex = MERGED_CHANNELS.indexOf(channel);
+        const card = document.createElement("div");
+        card.className = `channel-card ${channel.themeClass || ""}`;
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+
+        const isFav = favs.includes(channel.id);
+        const favHtml = isFav ? `<span class="fav-star-badge">⭐</span>` : "";
+        const sourcesCount = (channel.sources && channel.sources.length > 1) ? `Multi (${channel.sources.length})` : "Directo";
+
+        // EPG si está disponible
+        let epgHtml = "";
+        if (window.AndyEpg && typeof window.AndyEpg.getChannelEpg === "function") {
+          const epg = window.AndyEpg.getChannelEpg(channel.id);
+          if (epg && epg.now) {
+            epgHtml = `
+              <div class="channel-epg-preview">
+                <div class="epg-now-header">
+                  <span>● Ahora</span>
+                  <span>${epg.now.start} - ${epg.now.end}</span>
+                </div>
+                <div class="epg-now-title">${epg.now.title}</div>
+              </div>
+            `;
+          }
+        }
+
+        card.innerHTML = `
+          <span class="channel-number-tag">${channel.number}</span>
+          <span class="source-type-tag">${sourcesCount}</span>
+          ${favHtml}
+          <div class="channel-header-row">
+            <div class="logo-container">${channel.logoSvg || "📺"}</div>
+            <div class="channel-id-info">
+              <div class="channel-title">${channel.name}</div>
+              <div class="channel-subtitle">${channel.subtitle || ""}</div>
+            </div>
+          </div>
+          ${epgHtml}
+        `;
+
+        card.addEventListener("click", () => openChannel(globalIndex));
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.keyCode === 13) {
+            e.preventDefault();
+            openChannel(globalIndex);
+          }
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    pills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        pills.forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        currentCategory = pill.getAttribute("data-category");
+        renderChannelsGrid();
+      });
+    });
+
+    /* ==========================================================================
+       BARRA LATERAL EN EL REPRODUCTOR Y ZAPPING
+       ========================================================================== */
+
+    function renderChannelBar() {
+      if (!channelBar) return;
+      channelBar.innerHTML = "";
+      MERGED_CHANNELS.forEach((channel, index) => {
+        const btn = document.createElement("button");
+        btn.className = `btn-bar-channel ${channel.themeClass || ""}`;
+        btn.id = `btn-bar-${channel.id}`;
+        btn.tabIndex = 0;
+        btn.textContent = `${channel.number}. ${channel.name}`;
+
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openChannel(index);
+          resetOverlayTimer();
+        });
+
+        btn.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.keyCode === 13) {
+            e.stopPropagation();
+            openChannel(index);
+            resetOverlayTimer();
+          }
+        });
+
+        btn.addEventListener("focus", () => {
+          scrollSideButtonToCenter(btn, true);
+        });
+
+        channelBar.appendChild(btn);
+      });
+    }
+
+    function updateActiveButtonInBar() {
+      let activeBtn = null;
+      MERGED_CHANNELS.forEach((ch, idx) => {
+        const btn = document.getElementById(`btn-bar-${ch.id}`);
+        if (btn) {
+          const isActive = idx === currentIndex;
+          btn.classList.toggle("active", isActive);
+          if (isActive) activeBtn = btn;
+        }
+      });
+      if (activeBtn) {
+        scrollSideButtonToCenter(activeBtn, true);
+        requestAnimationFrame(() => scrollSideButtonToCenter(activeBtn, false));
+      }
+    }
+
+    /* ==========================================================================
+       MOTOR DE REPRODUCCIÓN DUAL (ANDROID MEDIA3 vs WEB HLS.JS / SANDBOX)
+       ========================================================================== */
+
+    const viewHome = document.getElementById("view-home");
+    const viewPlayer = document.getElementById("view-player");
+    const video = document.getElementById("tv-video");
+    const iframe = document.getElementById("tv-iframe");
+    const loader = document.getElementById("player-loader");
+    const loaderText = document.getElementById("player-loader-text");
+    const playerOverlay = document.getElementById("player-overlay");
+    const btnSwitchSource = document.getElementById("btn-player-switch-source");
+    const btnPlayerBack = document.getElementById("btn-player-back");
+    const btnPlayerFav = document.getElementById("btn-player-fav");
+
+    function showLoading(msg = "Sintonizando...") {
+      loaderText.textContent = msg;
+      loader.style.display = "flex";
+    }
+    function hideLoading() {
+      loader.style.display = "none";
+    }
+
+    function resetOverlayTimer() {
+      playerOverlay.classList.remove("hidden");
+      clearTimeout(overlayTimer);
+      overlayTimer = setTimeout(() => {
+        playerOverlay.classList.add("hidden");
+      }, 5000);
+    }
+
+    function openChannel(index) {
+      if (index < 0 || index >= MERGED_CHANNELS.length) return;
+      currentIndex = index;
+      const channel = MERGED_CHANNELS[currentIndex];
+
+      viewHome.style.display = "none";
+      viewPlayer.style.display = "flex";
+
+      document.getElementById("player-current-channel-title").textContent = `${channel.number}. ${channel.name}`;
+      document.getElementById("osd-channel-num").textContent = channel.number;
+      document.getElementById("osd-channel-name").textContent = channel.name;
+
+      // Actualizar EPG en OSD
+      if (window.AndyEpg && typeof window.AndyEpg.getChannelEpg === "function") {
+        const epg = window.AndyEpg.getChannelEpg(channel.id);
+        if (epg && epg.now) {
+          document.getElementById("osd-prog-title").textContent = epg.now.title;
+          document.getElementById("osd-prog-time").textContent = `${epg.now.start} - ${epg.now.end}`;
+          document.getElementById("osd-prog-next").textContent = `A continuación: ${epg.next.title} (${epg.next.start})`;
+        }
+      }
+
+      updateActiveButtonInBar();
+      updateFavButtonState();
+      resetOverlayTimer();
+      playCurrentChannelSource();
+    }
+
+    function playCurrentChannelSource() {
+      clearTimeout(autoFallbackTimer);
+      const channel = MERGED_CHANNELS[currentIndex];
+      const source = channel.sources[channel.currentSourceIndex || 0];
+
+      // Actualizar botón de señal
+      btnSwitchSource.textContent = `📡 ${source.label || `Opción ${(channel.currentSourceIndex || 0) + 1}`}`;
+      document.getElementById("osd-source-tag").textContent = source.label || `Opción ${(channel.currentSourceIndex || 0) + 1}`;
+
+      showLoading(`Cargando ${channel.name} (${source.label || "Opción 1"})...`);
+
+      // Configurar temporizador de Auto-Fallback (4 segundos)
+      autoFallbackTimer = setTimeout(() => {
+        console.warn(`[Auto-Fallback] Timeout de 4s en señal de ${channel.name}, saltando a siguiente fuente...`);
+        switchChannelSourceAuto();
+      }, 4000);
+
+      // Limpiar reproductores
+      if (hlsInstance) {
+        hlsInstance.destroy();
+        hlsInstance = null;
+      }
+      video.pause();
+      video.removeAttribute("src");
+      iframe.src = "about:blank";
+
+      const sourceType = source.tipo || source.type || "hls";
+      console.log(`[Play] Sintonizando: ${channel.name} | Tipo: ${sourceType} | URL: ${source.url}`);
+
+      // RAMA A: APLICACIÓN ANDROID TV NATIVA
+      if (isAndroidApp) {
+        if (sourceType === "web_hls" || sourceType === "web_bridge") {
+          // Extraer .m3u8 Flussonic dinámico con headers en segundo plano nativo
+          video.style.display = "none";
+          iframe.style.display = "none";
+          window.AndroidBridge.resolveAndPlayWebHls(source.url, source.referer || "", sourceType);
+          return;
+        } else if (sourceType === "telefe-token") {
+          // Telefe token API
+          fetch(channel.tokenApiUrl || "https://57j4mtvcjjf7siqnnvkixb5d3i0uvjei.lambda-url.us-east-1.on.aws/?stream_id=6a024684fd4ca6a938f3a118")
+            .then(r => r.json())
+            .then(data => {
+              if (data && data.access_token) {
+                const m3u8Url = `https://mdstrm.com/live-stream-playlist/6a024684fd4ca6a938f3a118.m3u8?access_token=${data.access_token}`;
+                startHlsStreamWeb(m3u8Url, true);
+              } else {
+                switchChannelSourceAuto();
+              }
+            }).catch(() => switchChannelSourceAuto());
+          return;
+        } else if (sourceType === "youtube-live") {
+          video.style.display = "none";
+          iframe.style.display = "block";
+          iframe.src = `https://www.youtube.com/embed/${source.ytVideoId}?autoplay=1&controls=0`;
+          hideLoading();
+          clearTimeout(autoFallbackTimer);
+          return;
+        } else {
+          // HLS directo para ExoPlayer
+          video.style.display = "none";
+          iframe.style.display = "none";
+          window.AndroidBridge.playNativeHlsWithHeaders(source.url, JSON.stringify(source.headers || {}));
+          return;
+        }
+      }
+
+      // RAMA B: NAVEGADOR WEB / PWA (hls.js + Sandboxed Iframe)
+      if (sourceType === "web_hls" || sourceType === "web_bridge" || sourceType === "embed") {
+        video.style.display = "none";
+        iframe.style.display = "block";
+        iframe.src = source.url;
+        iframe.onload = () => {
+          hideLoading();
+          clearTimeout(autoFallbackTimer);
+        };
+        iframe.onerror = () => switchChannelSourceAuto();
+      } else if (sourceType === "youtube-live") {
+        video.style.display = "none";
+        iframe.style.display = "block";
+        iframe.src = `https://www.youtube.com/embed/${source.ytVideoId}?autoplay=1&controls=0`;
+        hideLoading();
+        clearTimeout(autoFallbackTimer);
+      } else {
+        // HLS directo
+        iframe.style.display = "none";
+        video.style.display = "block";
+        startHlsStreamWeb(source.url, source.useProxy);
+      }
+    }
+
+    function startHlsStreamWeb(rawUrl, useProxy) {
+      const finalUrl = useProxy ? getProxiedUrl(rawUrl) : rawUrl;
+      if (Hls.isSupported()) {
+        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
+        hlsInstance.loadSource(finalUrl);
+        hlsInstance.attachMedia(video);
+
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+          hideLoading();
+          clearTimeout(autoFallbackTimer);
+          video.play().catch(() => {});
+        });
+
+        hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+          if (data.fatal) {
+            console.warn("Fallo HLS web fatal:", data);
+            switchChannelSourceAuto();
+          }
+        });
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = finalUrl;
+        video.addEventListener("loadedmetadata", () => {
+          hideLoading();
+          clearTimeout(autoFallbackTimer);
+          video.play().catch(() => {});
+        });
+        video.addEventListener("error", () => switchChannelSourceAuto());
+      }
+    }
+
+    // Callbacks globales desde AndroidBridge
+    window.onNativeVideoPlaying = function() {
+      hideLoading();
+      clearTimeout(autoFallbackTimer);
+    };
+    window.onNativeVideoError = function() {
+      console.warn("Error notificado por ExoPlayer nativo");
+      switchChannelSourceAuto();
+    };
+    window.onDynamicStreamSuccess = function(url) {
+      hideLoading();
+      clearTimeout(autoFallbackTimer);
+    };
+    window.onDynamicStreamFallbackWeb = function() {
+      const channel = MERGED_CHANNELS[currentIndex];
+      const source = channel.sources[channel.currentSourceIndex || 0];
+      video.style.display = "none";
+      iframe.style.display = "block";
+      iframe.src = source.url;
+      hideLoading();
+      clearTimeout(autoFallbackTimer);
+    };
+    window.onDynamicStreamError = function(err) {
+      console.warn("Error extractor dinámico nativo:", err);
+      switchChannelSourceAuto();
+    };
+
+    function switchChannelSourceAuto() {
+      clearTimeout(autoFallbackTimer);
+      const channel = MERGED_CHANNELS[currentIndex];
+      if (!channel || !channel.sources || channel.sources.length <= 1) {
+        hideLoading();
+        return;
+      }
+      const nextIdx = ((channel.currentSourceIndex || 0) + 1);
+      if (nextIdx < channel.sources.length) {
+        channel.currentSourceIndex = nextIdx;
+        console.log(`[Auto-Fallback] Cambiando a opción ${nextIdx + 1}`);
+        playCurrentChannelSource();
+      } else {
+        hideLoading();
+        console.log("[Auto-Fallback] Se agotaron todas las opciones disponibles");
+      }
+    }
+
+    function switchChannelSourceManual() {
+      const channel = MERGED_CHANNELS[currentIndex];
+      if (!channel || !channel.sources || channel.sources.length <= 1) return;
+      channel.currentSourceIndex = ((channel.currentSourceIndex || 0) + 1) % channel.sources.length;
+      playCurrentChannelSource();
+    }
+
+    btnSwitchSource.addEventListener("click", switchChannelSourceManual);
+    btnPlayerBack.addEventListener("click", () => {
+      clearTimeout(autoFallbackTimer);
+      if (hlsInstance) hlsInstance.destroy();
+      if (isAndroidApp && window.AndroidBridge.stopNativeHls) window.AndroidBridge.stopNativeHls();
+      viewPlayer.style.display = "none";
+      viewHome.style.display = "flex";
+      renderChannelsGrid();
+    });
+
+    btnPlayerFav.addEventListener("click", () => {
+      const ch = MERGED_CHANNELS[currentIndex];
+      if (ch) toggleFavorite(ch.id);
+    });
+
+    function updateFavButtonState() {
+      const ch = MERGED_CHANNELS[currentIndex];
+      if (!ch) return;
+      const isFav = getFavorites().includes(ch.id);
+      btnPlayerFav.textContent = isFav ? "★ Favorito" : "☆ Favorito";
+    }
+
+    /* ==========================================================================
+       MODAL DE VINCULACIÓN DE SECRET GIST
+       ========================================================================== */
+
+    const modalGist = document.getElementById("modal-gist-config");
+    const btnOpenGist = document.getElementById("btn-open-gist-modal");
+    const btnCloseGist = document.getElementById("btn-gist-cancel");
+    const btnSaveGist = document.getElementById("btn-gist-save");
+    const btnUnlinkGist = document.getElementById("btn-gist-unlink");
+    const inputGist = document.getElementById("input-gist-url");
+    const msgGist = document.getElementById("gist-status-message");
+
+    btnOpenGist.addEventListener("click", () => {
+      const current = getSavedGistUrl();
+      inputGist.value = current;
+      if (current) {
+        msgGist.textContent = "✅ Gist vinculado actualmente.";
+        btnUnlinkGist.style.display = "inline-flex";
+      } else {
+        msgGist.textContent = "Sin Gist vinculado.";
+        btnUnlinkGist.style.display = "none";
+      }
+      modalGist.style.display = "flex";
+      inputGist.focus();
+    });
+
+    btnCloseGist.addEventListener("click", () => {
+      modalGist.style.display = "none";
+    });
+
+    btnSaveGist.addEventListener("click", async () => {
+      const url = inputGist.value.trim();
+      saveGistUrl(url);
+      modalGist.style.display = "none";
+      await loadAllChannels();
+    });
+
+    btnUnlinkGist.addEventListener("click", async () => {
+      saveGistUrl("");
+      modalGist.style.display = "none";
+      await loadAllChannels();
+    });
+
+    document.getElementById("btn-refresh-channels").addEventListener("click", () => {
+      loadAllChannels();
+    });
+
+    /* ==========================================================================
+       CONTROL REMOTO Y TECLADO TV
+       ========================================================================== */
+
+    window.addEventListener("keydown", (e) => {
+      // Tecla Back
+      if (e.key === "Escape" || e.keyCode === 27) {
+        if (modalGist.style.display === "flex") {
+          modalGist.style.display = "none";
+          return;
+        }
+        if (viewPlayer.style.display === "flex") {
+          btnPlayerBack.click();
+          return;
+        }
+      }
+
+      // En el reproductor
+      if (viewPlayer.style.display === "flex") {
+        resetOverlayTimer();
+        if (e.keyCode === 166 /* CH+ */) {
+          openChannel((currentIndex + 1) % MERGED_CHANNELS.length);
+        } else if (e.keyCode === 167 /* CH- */) {
+          openChannel((currentIndex - 1 + MERGED_CHANNELS.length) % MERGED_CHANNELS.length);
+        }
+      }
+    });
+
+    // Iniciar carga
+    loadAllChannels();
+  </script>
+</body>
+</html>

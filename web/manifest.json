@@ -1,0 +1,19 @@
+{
+  "name": "AndyTV Plus",
+  "short_name": "AndyTV+",
+  "description": "Televisión en Vivo y Deportes para Android TV y Web",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "theme_color": "#080c14",
+  "background_color": "#080c14",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

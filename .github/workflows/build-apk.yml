@@ -27,8 +27,8 @@ jobs:
       - name: Build APK with Gradle
         run: gradle assembleDebug
 
-      - name: Upload Debug APK
+      - name: Upload Debug APKs (Standard & Plus)
         uses: actions/upload-artifact@v4
         with:
-          name: MiTeleTV-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: AndyTV-Dual-debug-apks
+          path: app/build/outputs/apk/**/*.apk
