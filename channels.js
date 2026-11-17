@@ -145,21 +145,21 @@ window.DEFAULT_CHANNELS = [
     "name": "América TV",
     "subtitle": "Canal 2",
     "themeClass": "card-americatv",
-    "type": "youtube-live",
+    "type": "hls",
     "currentSourceIndex": 0,
     "sources": [
-      {
-        "label": "YouTube Live Oficial (americatv.com.ar)",
-        "type": "youtube-live",
-        "ytVideoId": "2XT2mmY8Of0",
-        "ytLivePageUrl": "https://www.youtube.com/@AmericaTV/live"
-      },
       {
         "label": "Web Oficial América TV (Google DAI HD)",
         "type": "hls",
         "url": "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
         "useProxy": false,
         "preferNativeAndroid": true
+      },
+      {
+        "label": "YouTube Live Oficial (americatv.com.ar)",
+        "type": "youtube-live",
+        "ytVideoId": "2XT2mmY8Of0",
+        "ytLivePageUrl": "https://www.youtube.com/@AmericaTV/live"
       },
       {
         "label": "Señal Directa 720p (ExoPlayer TV)",

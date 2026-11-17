@@ -32,7 +32,7 @@ Aplicación de televisión argentina en vivo diseñada específicamente para **A
 3. **C5N (Noticias 24hs)** — YouTube Live Oficial
 4. **El Trece (Canal 13)** — HLS Nativo 1080p VodGC
 5. **El Nueve (Canal 9)** — YouTube Live Oficial
-6. **América TV (Canal 2)** — YouTube Live Oficial / Fallback HLS
+6. **América TV (Canal 2)** — HLS HD Oficial Google DAI / YouTube Live
 7. **A24 (América 24)** — YouTube Live Oficial / Fallback HLS
 8. **TV Pública (Canal 7)** — YouTube Live Oficial
 9. **LN+ (La Nación +)** — YouTube Live Oficial
