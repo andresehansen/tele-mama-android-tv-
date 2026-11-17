@@ -21,11 +21,19 @@ window.DEFAULT_CHANNELS = [
         "type": "hls",
         "url": "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8",
         "useProxy": true
+      },
+      {
+        "label": "YouTube Live Oficial TN",
+        "type": "youtube-live",
+        "ytVideoId": "cb12KmMMDJA",
+        "ytLivePageUrl": "https://www.youtube.com/@todonoticias/live"
       }
     ],
     "hlsUrl": "https://live-01-01-tn.vodgc.net/TN_DAI_Beta/index.m3u8",
     "useProxy": false,
-    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0b2545\"/>\n            <path d=\"M15 15 L85 15 L60 85 L15 85 Z\" fill=\"#e65c00\" opacity=\"0.35\"/>\n            <text x=\"50\" y=\"65\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"44\" fill=\"#ffffff\" text-anchor=\"middle\">TN</text>\n          </svg>\n        "
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0b2545\"/>\n            <path d=\"M15 15 L85 15 L60 85 L15 85 Z\" fill=\"#e65c00\" opacity=\"0.35\"/>\n            <text x=\"50\" y=\"65\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"44\" fill=\"#ffffff\" text-anchor=\"middle\">TN</text>\n          </svg>\n        ",
+    "ytVideoId": "cb12KmMMDJA",
+    "ytLivePageUrl": "https://www.youtube.com/@todonoticias/live"
   },
   {
     "id": "telefe",
@@ -41,20 +49,14 @@ window.DEFAULT_CHANNELS = [
         "label": "Telefe Oficial 1080p (Señal Verificada)",
         "type": "telefe-token",
         "streamId": "6a024684fd4ca6a938f3a118"
-      },
-      {
-        "label": "Telefe Respaldo 1080p (IPTV Directo)",
-        "type": "hls",
-        "url": "http://45.173.231.22:8000/play/a053/index.m3u8",
-        "useProxy": true
       }
     ],
-    "hlsUrl": "http://45.173.231.22:8000/play/a053/index.m3u8",
     "tokenApiUrl": "https://57j4mtvcjjf7siqnnvkixb5d3i0uvjei.lambda-url.us-east-1.on.aws/?stream_id=6a024684fd4ca6a938f3a118",
     "streamId": "6a024684fd4ca6a938f3a118",
     "playerId": "69f8d6e334a190b16647b23b",
     "useProxy": false,
-    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <circle cx=\"28\" cy=\"50\" r=\"18\" fill=\"#2563eb\" />\n            <circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"#16a34a\" />\n            <circle cx=\"72\" cy=\"50\" r=\"18\" fill=\"#dc2626\" />\n            <text x=\"50\" y=\"86\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"16\" fill=\"#ffffff\" text-anchor=\"middle\">telefe</text>\n          </svg>\n        "
+    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <circle cx=\"28\" cy=\"50\" r=\"18\" fill=\"#2563eb\" />\n            <circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"#16a34a\" />\n            <circle cx=\"72\" cy=\"50\" r=\"18\" fill=\"#dc2626\" />\n            <text x=\"50\" y=\"86\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"16\" fill=\"#ffffff\" text-anchor=\"middle\">telefe</text>\n          </svg>\n        ",
+    "pinSources": true
   },
   {
     "id": "c5n",
@@ -149,8 +151,8 @@ window.DEFAULT_CHANNELS = [
       {
         "label": "YouTube Live Oficial (americatv.com.ar)",
         "type": "youtube-live",
-        "ytVideoId": "ICgWhNv7X2Q",
-        "ytLivePageUrl": "https://www.youtube.com/user/americatv/live"
+        "ytVideoId": "2XT2mmY8Of0",
+        "ytLivePageUrl": "https://www.youtube.com/@AmericaTV/live"
       },
       {
         "label": "Web Oficial América TV (Google DAI HD)",
@@ -177,8 +179,8 @@ window.DEFAULT_CHANNELS = [
       }
     ],
     "hlsUrl": "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
-    "ytVideoId": "ICgWhNv7X2Q",
-    "ytLivePageUrl": "https://www.youtube.com/user/americatv/live",
+    "ytVideoId": "2XT2mmY8Of0",
+    "ytLivePageUrl": "https://www.youtube.com/@AmericaTV/live",
     "useProxy": false,
     "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0284c7\"/>\n            <polygon points=\"50,18 82,80 18,80\" fill=\"#ea580c\"/>\n            <circle cx=\"50\" cy=\"54\" r=\"16\" fill=\"#facc15\"/>\n            <text x=\"50\" y=\"93\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"12\" fill=\"#ffffff\" text-anchor=\"middle\">AMÉRICA</text>\n          </svg>\n        "
   },
@@ -362,19 +364,27 @@ window.DEFAULT_CHANNELS = [
     "name": "Canal 26",
     "subtitle": "Noticias en Vivo",
     "themeClass": "card-canal26",
-    "type": "youtube-live",
+    "type": "hls",
     "currentSourceIndex": 0,
     "sources": [
       {
-        "label": "YouTube Oficial 24/7",
+        "label": "Telecentro HD 1080p (Señal Principal)",
+        "type": "hls",
+        "url": "https://stream-gtlc.telecentro.net.ar/hls/canal26hls/main.m3u8",
+        "useProxy": false
+      },
+      {
+        "label": "YouTube Canal 26 En Vivo",
         "type": "youtube-live",
-        "ytVideoId": "w_Ma8oQLmSM",
+        "ytVideoId": "iaooxPL8G_I",
         "ytLivePageUrl": "https://www.youtube.com/@canal26/live"
       }
     ],
-    "ytVideoId": "w_Ma8oQLmSM",
+    "ytVideoId": "iaooxPL8G_I",
     "ytLivePageUrl": "https://www.youtube.com/@canal26/live",
-    "logoSvg": "<svg viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#dc2626\"/><text x=\"50\" y=\"66\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"44\" fill=\"#ffffff\" text-anchor=\"middle\">26</text></svg>"
+    "logoSvg": "<svg viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#dc2626\"/><text x=\"50\" y=\"66\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"44\" fill=\"#ffffff\" text-anchor=\"middle\">26</text></svg>",
+    "hlsUrl": "https://stream-gtlc.telecentro.net.ar/hls/canal26hls/main.m3u8",
+    "useProxy": false
   },
   {
     "id": "fifaplus",
@@ -402,5 +412,26 @@ window.DEFAULT_CHANNELS = [
     "hlsUrl": "https://6c849fb3.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctbXhfRklGQVBsdXNTcGFuaXNoLTFfSExT/playlist.m3u8",
     "useProxy": false,
     "logoSvg": "<svg viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0284c7\"/><text x=\"50\" y=\"55\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"28\" fill=\"#ffffff\" text-anchor=\"middle\">FIFA</text><text x=\"50\" y=\"80\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"26\" fill=\"#facc15\" text-anchor=\"middle\">+</text></svg>"
+  },
+  {
+    "id": "quieromusica",
+    "number": 15,
+    "category": "entretenimiento",
+    "name": "Quiero Música TV",
+    "subtitle": "Música Argentina 24hs",
+    "themeClass": "card-quieromusica",
+    "type": "youtube-live",
+    "currentSourceIndex": 0,
+    "sources": [
+      {
+        "label": "YouTube Live Oficial",
+        "type": "youtube-live",
+        "ytVideoId": "vGNglKWqwcQ",
+        "ytLivePageUrl": "https://www.youtube.com/@QuieroMusicaTV/live"
+      }
+    ],
+    "ytVideoId": "vGNglKWqwcQ",
+    "ytLivePageUrl": "https://www.youtube.com/@QuieroMusicaTV/live",
+    "logoSvg": "<svg viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#7c3aed\"/><text x=\"50\" y=\"52\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"28\" fill=\"#ffffff\" text-anchor=\"middle\">QM TV</text><text x=\"50\" y=\"80\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"11\" fill=\"#ddd6fe\" text-anchor=\"middle\">MÚSICA TV</text></svg>"
   }
 ];

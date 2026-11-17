@@ -1,0 +1,33 @@
+{
+  "_comment": "Política de fuentes comunitarias (iptv-org). La usan el motor diario (tools/sync_iptv_org.py) y el cliente (source-health.js). Solo se aceptan fuentes que cumplan TODAS las reglas.",
+  "httpsOnly": true,
+  "blockBareIp": true,
+  "blockCustomHeaders": true,
+  "maxCommunitySourcesPerChannel": 3,
+  "allowedHosts": [
+    "vodgc.net",
+    "telecentro.net.ar",
+    "mdstrm.com"
+  ],
+  "paidChannelIds": [
+    "tycsports",
+    "tntsports",
+    "espn",
+    "foxsports",
+    "dsports",
+    "dazn"
+  ],
+  "channelMap": {
+    "tn": "TN.ar",
+    "telefe": "Telefe.ar",
+    "c5n": "C5N.ar",
+    "eltrece": "ElTrece.ar",
+    "elnueve": "ElNueve.ar",
+    "americatv": "AmericaTV.ar",
+    "a24": "A24.ar",
+    "tvpublica": "TelevisionPublica.ar",
+    "cronica": "CronicaTV.ar",
+    "canalrural": "CanalRural.ar",
+    "canal26": "Canal26.ar"
+  }
+}

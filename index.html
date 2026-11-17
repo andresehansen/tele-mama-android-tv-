@@ -20,6 +20,7 @@
   <!-- Canales de televisión y Guía EPG por defecto -->
   <script src="channels.js"></script>
   <script src="epg.js"></script>
+  <script src="source-health.js"></script>
 
   <style>
     * {
@@ -1971,6 +1972,7 @@
                   return;
                 }
                 silentRetryCount = 0;
+                if (window.AndySourceHealth) AndySourceHealth.logFailure(channel, getCurrentSource(channel), "hls-network-error");
                 // Si se agotaron los reintentos silenciosos y el canal tiene más fuentes configuradas, intentar la siguiente automáticamente
                 if (channel.sources && channel.sources.length > 1) {
                   if ((channel.currentSourceIndex || 0) < channel.sources.length - 1) {
@@ -2203,7 +2205,7 @@
 
           if (data && data.access_token) {
             const m3u8Url = `https://mdstrm.com/live-stream-playlist/${channel.streamId}.m3u8?access_token=${data.access_token}`;
-            startHlsStream(channel, m3u8Url, true);
+            startHlsStream(channel, m3u8Url, true, true); // true final: nunca ExoPlayer nativo (mdstrm devuelve 403 sin el proxy)
           } else {
             throw new Error("Token no encontrado");
           }
@@ -2300,7 +2302,6 @@
     const btnSaveM3u = document.getElementById("btn-save-m3u");
     const inputCustomM3u = document.getElementById("input-custom-m3u");
 
-    const SPORTS_KEYWORDS_REGEX = /\b(espn|fox\s*sports|dsports|directv\s*sports|tyc|tnt\s*sports|pack\s*f[uú]tbol|f1|f[oó]rmula\s*1|dazn|nba|ufc|win\s*sports|gol\s*peru|tudn|beinsports|deportv|am[eé]rica\s*sports)\b/i;
 
     function parseAndMergeM3uText(text, sourcePrefixLabel = "Lista M3U") {
       const lines = text.split("\n");
@@ -2731,8 +2732,7 @@
        8. MOTOR INTELIGENTE AUTO-ACTUALIZADOR (IPTV-ORG + CLOUD OTA)
        ========================================================================== */
     const IPTV_ORG_PLAYLISTS = [
-      "https://iptv-org.github.io/iptv/countries/ar.m3u",
-      "https://iptv-org.github.io/iptv/categories/sports.m3u"
+      "https://iptv-org.github.io/iptv/countries/ar.m3u"
     ];
     const CHANNEL_MATCHERS = {
       tn: /\b(todo noticias|^tn\b|tvg-id="todonoticias)/i,
@@ -2842,15 +2842,6 @@
             const hasHeaders = Object.keys(pendingHeaders).length > 0;
             const headersCopy = hasHeaders ? { ...pendingHeaders } : undefined;
 
-            // Registrar todas las señales deportivas descubiertas para el buscador de IPs por partido (estilo AK47)
-            if (SPORTS_KEYWORDS_REGEX.test(lastExtInf) || /group-title=".*sport/i.test(lastExtInf)) {
-              registerDiscoveredSportsStream({
-                name: lastDisplayName,
-                extinf: lastExtInf,
-                url: line,
-                headers: headersCopy
-              });
-            }
 
             CHANNELS.forEach((ch) => {
               const regex = CHANNEL_MATCHERS[ch.id];
@@ -2858,6 +2849,9 @@
                 // No contaminar Telefe oficial con repetidoras regionales
                 if (ch.id === "telefe" && /\b(salta|tucum[aá]n|rosario|c[oó]rdoba|neuqu[eé]n|mar del plata|bah[ií]a blanca|santa fe)\b/i.test(lastExtInf)) {
                   return;
+                }
+                if (!(window.AndySourceHealth && AndySourceHealth.isAllowedCommunitySource(line, headersCopy, ch))) {
+                  return; // política de fuentes: https, dominio permitido, sin IP directa/headers, no pago
                 }
                 const alreadyExists = (ch.sources || []).some(s => s.url === line);
                 if (!alreadyExists) {
@@ -2889,6 +2883,8 @@
                 type: "hls",
                 url: item.url,
                 useProxy: check.useProxy,
+                community: true,
+                origin: "iptv-org-runtime",
                 preferNativeAndroid: hasHdr,
                 headers: item.headers
               });
@@ -2922,6 +2918,7 @@
       btnSyncCloud.addEventListener("click", async () => {
         btnSyncCloud.textContent = "⏳ Actualizando...";
         await loadChannels(true);
+        startSourceHealth(500);
         if (window.AndroidBridge && typeof window.AndroidBridge.reloadRemoteApp === "function") {
           window.AndroidBridge.reloadRemoteApp();
         } else {
@@ -2936,6 +2933,17 @@
     // Renderizado inmediato al evaluar el script
     renderChannelsGrid();
     renderChannelBar();
+
+    // Motor inteligente de fuentes: aplica el último orden guardado y escanea en segundo plano
+    function startSourceHealth(delayMs) {
+      if (!window.AndySourceHealth) return;
+      AndySourceHealth.init({
+        getChannels: () => CHANNELS,
+        proxyUrl: CLOUDFLARE_WORKER_URL,
+        isBusy: (ch) => viewPlayer.style.display !== "none" && CHANNELS[currentIndex] === ch
+      });
+      AndySourceHealth.startBackground(delayMs);
+    }
 
     // Iniciar foco inicial en el último canal visto y sincronización inteligente en segundo plano
     async function initAppFocusAndSync() {
@@ -2952,7 +2960,11 @@
         || channelCardsElements[0];
       if (targetCard) targetCard.focus();
       loadSavedCustomM3uSilently();
-      setTimeout(() => syncIptvOrgSources(false), 1500);
+      startSourceHealth(3500);
+      setTimeout(async () => {
+        if (window.AndySourceHealth) await AndySourceHealth.loadPolicy();
+        syncIptvOrgSources(false);
+      }, 1500);
     }
 
     if (document.readyState === "loading") {
