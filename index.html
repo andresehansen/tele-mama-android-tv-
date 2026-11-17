@@ -635,6 +635,7 @@
       background: #000000;
       z-index: 1000;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .video-container {
@@ -1547,6 +1548,26 @@
     });
 
     const channelBar = document.getElementById("channel-selector-bar");
+
+    // Centra el canal en la barra lateral vertical siempre que sea posible
+    function scrollSideButtonToCenter(btn, smooth = true) {
+      if (!btn) return;
+      try {
+        btn.scrollIntoView({
+          block: "center",
+          inline: "nearest",
+          behavior: smooth ? "smooth" : "auto"
+        });
+      } catch (e) {
+        if (channelBar) {
+          const barRect = channelBar.getBoundingClientRect();
+          const btnRect = btn.getBoundingClientRect();
+          const offset = (btnRect.top - barRect.top) - (channelBar.clientHeight / 2) + (btn.clientHeight / 2);
+          channelBar.scrollTop += offset;
+        }
+      }
+    }
+
     function renderChannelBar() {
       if (!channelBar) return;
       channelBar.innerHTML = "";
@@ -1569,6 +1590,10 @@
             openChannel(index);
             resetOverlayTimer();
           }
+        });
+
+        btn.addEventListener("focus", () => {
+          scrollSideButtonToCenter(btn, true);
         });
 
         channelBar.appendChild(btn);
@@ -1764,16 +1789,24 @@
     });
 
     function updateActiveButtonInBar() {
+      let activeBtn = null;
       CHANNELS.forEach((ch, idx) => {
         const btn = document.getElementById(`btn-bar-${ch.id}`);
         if (btn) {
           const isActive = idx === currentIndex;
           btn.classList.toggle("active", isActive);
           if (isActive) {
-            btn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+            activeBtn = btn;
           }
         }
       });
+      if (activeBtn) {
+        scrollSideButtonToCenter(activeBtn, true);
+        // Garantizar centrado al conmutar vistas display:none -> display:flex
+        requestAnimationFrame(() => {
+          scrollSideButtonToCenter(activeBtn, false);
+        });
+      }
     }
 
     function getCurrentSource(channel) {
@@ -2621,7 +2654,7 @@
             const activeBarBtn = sideBtns[currentIndex] || sideBtns[0];
             if (activeBarBtn) {
               activeBarBtn.focus();
-              activeBarBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+              scrollSideButtonToCenter(activeBarBtn, true);
             }
             return;
           }
@@ -2648,14 +2681,14 @@
                 } else if (sideBtns.length > 0) {
                   const activeBarBtn = sideBtns[currentIndex] || sideBtns[0];
                   activeBarBtn.focus();
-                  activeBarBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                  scrollSideButtonToCenter(activeBarBtn, true);
                 }
               } else if (e.key === "ArrowDown") {
                 // Flecha Abajo: baja a la guía lateral de canales en el canal actual
                 if (sideBtns.length > 0) {
                   const activeBarBtn = sideBtns[currentIndex] || sideBtns[0];
                   activeBarBtn.focus();
-                  activeBarBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                  scrollSideButtonToCenter(activeBarBtn, true);
                 }
               }
             } 
@@ -2665,13 +2698,13 @@
                 // Baja al siguiente canal de la guía
                 if (sIdx + 1 < sideBtns.length) {
                   sideBtns[sIdx + 1].focus();
-                  sideBtns[sIdx + 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
+                  scrollSideButtonToCenter(sideBtns[sIdx + 1], true);
                 }
               } else if (e.key === "ArrowUp") {
                 // Sube al canal anterior. Si ya está en el primer canal visible o canal 1: ¡SALTA DIRECTO A LOS BOTONES SUPERIORES!
                 if (sIdx - 1 >= 0) {
                   sideBtns[sIdx - 1].focus();
-                  sideBtns[sIdx - 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
+                  scrollSideButtonToCenter(sideBtns[sIdx - 1], true);
                 } else if (topBtns.length > 0) {
                   topBtns[0].focus();
                 }
@@ -2691,7 +2724,7 @@
             else if (sideBtns.length > 0) {
               const activeBarBtn = sideBtns[currentIndex] || sideBtns[0];
               activeBarBtn.focus();
-              activeBarBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+              scrollSideButtonToCenter(activeBarBtn, true);
             }
           }
         }
