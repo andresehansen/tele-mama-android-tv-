@@ -155,31 +155,14 @@
         "preferNativeAndroid": true
       },
       {
-        "label": "YouTube Live Oficial (americatv.com.ar)",
-        "type": "youtube-live",
-        "ytVideoId": "2XT2mmY8Of0",
-        "ytLivePageUrl": "https://www.youtube.com/@AmericaTV/live"
-      },
-      {
-        "label": "Señal Directa 720p (ExoPlayer TV)",
+        "label": "Web Oficial América TV (Respaldo Proxy)",
         "type": "hls",
-        "url": "https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8",
-        "useProxy": false,
-        "preferNativeAndroid": true,
-        "headers": {
-          "User-Agent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, como Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-          "Referer": "https://vmf.edge-apps.net/"
-        }
-      },
-      {
-        "label": "Reproductor Web Oficial América TV",
-        "type": "embed",
-        "url": "https://vmf.edge-apps.net/embed/live.php?streamname=americahls-100056&autoplay=true"
+        "url": "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
+        "useProxy": true,
+        "preferNativeAndroid": false
       }
     ],
     "hlsUrl": "https://dai.google.com/linear/hls/event/OY2i_lL4SMyXE5Zaj4ULEg/master.m3u8",
-    "ytVideoId": "2XT2mmY8Of0",
-    "ytLivePageUrl": "https://www.youtube.com/@AmericaTV/live",
     "useProxy": false,
     "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0284c7\"/>\n            <polygon points=\"50,18 82,80 18,80\" fill=\"#ea580c\"/>\n            <circle cx=\"50\" cy=\"54\" r=\"16\" fill=\"#facc15\"/>\n            <text x=\"50\" y=\"93\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"12\" fill=\"#ffffff\" text-anchor=\"middle\">AMÉRICA</text>\n          </svg>\n        "
   },
