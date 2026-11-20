@@ -84,3 +84,20 @@ test("channels.json y channels.js están sincronizados", () => {
   const m = /window\.DEFAULT_CHANNELS\s*=\s*([\s\S]*);\s*$/.exec(js);
   assert.deepStrictEqual(JSON.parse(m[1]), json);
 });
+
+test("sourceKey diferencia fuentes directa y proxy con la misma URL", () => {
+  const direct = { type: "hls", url: "https://dai.google.com/master.m3u8", useProxy: false };
+  const proxy = { type: "hls", url: "https://dai.google.com/master.m3u8", useProxy: true };
+  assert.notStrictEqual(sourceKey(direct), sourceKey(proxy));
+  assert.strictEqual(sourceKey(direct), "hls|https://dai.google.com/master.m3u8");
+  assert.strictEqual(sourceKey(proxy), "hls|https://dai.google.com/master.m3u8|proxy");
+});
+
+test("América TV tiene Referer en fuente principal y respaldo proxy", () => {
+  const chs = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "channels.json"), "utf8"));
+  const america = chs.find(c => c.id === "americatv");
+  assert.strictEqual(america.pinSources, true);
+  assert.strictEqual(america.sources[0].headers.Referer, "https://vmf.edge-apps.net/");
+  assert.strictEqual(america.sources[1].useProxy, true);
+  assert.strictEqual(america.sources[1].preferNativeAndroid, false);
+});

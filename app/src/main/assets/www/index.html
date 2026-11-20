@@ -18,9 +18,9 @@
     }
   </script>
   <!-- Canales de televisión y Guía EPG por defecto -->
-  <script src="channels.js?v=20261117_3"></script>
+  <script src="channels.js?v=20261120_1"></script>
   <script src="epg.js?v=20261117_3"></script>
-  <script src="source-health.js"></script>
+  <script src="source-health.js?v=20261120_1"></script>
 
   <style>
     * {
@@ -1275,7 +1275,7 @@
 
     async function loadChannels(forceRemote = false) {
       try {
-        const cacheKey = 'andytv_channels_cache_v3';
+        const cacheKey = 'andytv_channels_cache_v4';
         if (!CHANNELS || CHANNELS.length === 0) {
           const cached = localStorage.getItem(cacheKey);
           if (cached) {
@@ -1909,9 +1909,13 @@
     function startHlsStream(channel, rawHlsUrl, forceProxy, skipNativeAndroid) {
       const source = getCurrentSource(channel);
       const hasCustomHeaders = !!(source && source.headers && Object.keys(source.headers).length > 0);
+      const shouldUseNativeAndroid = !skipNativeAndroid
+        && !!window.AndroidBridge
+        && !(source && source.preferNativeAndroid === false)
+        && !(forceProxy && !hasCustomHeaders);
 
-      // Si estamos en Android TV y la fuente prefiere decodificación por hardware nativo (ExoPlayer) o requiere headers HTTP (#EXTVLCOPT)
-      if (!skipNativeAndroid && window.AndroidBridge) {
+      // Si estamos en Android TV y la fuente no deshabilitó ExoPlayer (ni pide proxy sin headers), reproducir nativamente
+      if (shouldUseNativeAndroid) {
         video.style.display = "none";
         iframe.style.display = "none";
         document.body.style.backgroundColor = "transparent";
@@ -1932,7 +1936,8 @@
       video.muted = false;
       video.volume = 1.0;
 
-      const shouldUseProxy = (forceProxy || channel.useProxy) && !!CLOUDFLARE_WORKER_URL;
+      // En navegador/WebView (Hls.js) no se pueden inyectar headers como Referer: usar proxy automáticamente si la fuente los requiere
+      const shouldUseProxy = (forceProxy || channel.useProxy || hasCustomHeaders) && !!CLOUDFLARE_WORKER_URL;
       const initialUrl = shouldUseProxy ? getProxiedUrl(rawHlsUrl) : rawHlsUrl;
 
       if (Hls.isSupported() && rawHlsUrl) {

@@ -64,7 +64,8 @@
   }
 
   function sourceKey(src) {
-    return [src.type, src.url || src.ytVideoId || src.ytChannelId || src.streamId || src.label || ""].join("|");
+    const base = [src.type, src.url || src.ytVideoId || src.ytChannelId || src.streamId || src.label || ""].join("|");
+    return src.useProxy ? base + "|proxy" : base;
   }
 
   /* ---------------- parseo de HLS ---------------- */
