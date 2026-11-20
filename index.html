@@ -1870,7 +1870,13 @@
       playCurrentChannel();
     }
 
+    let lastChannelStepAt = 0;
+
     function changeChannelRelative(delta) {
+      if (!CHANNELS || CHANNELS.length === 0) return;
+      const now = Date.now();
+      if (now - lastChannelStepAt < 120) return;
+      lastChannelStepAt = now;
       let next = (currentIndex + delta) % CHANNELS.length;
       if (next < 0) next = CHANNELS.length - 1;
       openChannel(next);
@@ -2488,6 +2494,23 @@
 
     window.addEventListener("keydown", (e) => {
       const isPlayerOpen = viewPlayer.style.display === "flex";
+      const isModalOpen = m3uModal && m3uModal.style.display === "flex";
+
+      // Teclas físicas de cambio de canal (CH+ / CH- del control remoto TV, PageUp / PageDown)
+      // Funciona tanto con el menú visible como oculto para permitir zapping continuo
+      if (!isModalOpen) {
+        const isChUp = e.key === "ChannelUp" || e.key === "PageUp" || e.code === "PageUp"
+          || e.keyCode === 166 || e.keyCode === 427 || e.keyCode === 33;
+        const isChDown = e.key === "ChannelDown" || e.key === "PageDown" || e.code === "PageDown"
+          || e.keyCode === 167 || e.keyCode === 428 || e.keyCode === 34;
+        if (isChUp || isChDown) {
+          e.preventDefault();
+          if (!e.repeat) {
+            changeChannelRelative(isChUp ? 1 : -1);
+          }
+          return;
+        }
+      }
 
       // Atajo para alternar señal en vivo: Tecla 'S' o tecla Amarilla de control remoto (F4 / 117 / 185)
       if (isPlayerOpen && (e.key === "s" || e.key === "S" || e.keyCode === 83 || e.keyCode === 117 || e.keyCode === 185)) {
@@ -2623,18 +2646,6 @@
 
         // Caso 1: Overlay OCULTO (viendo la señal a pantalla completa)
         if (playerOverlay.classList.contains("hidden")) {
-          // Teclas físicas de canal (Channel Up / Down en controles con botón CH+/-)
-          if (e.keyCode === 166 /* Channel Up */) {
-            e.preventDefault();
-            changeChannelRelative(1);
-            return;
-          }
-          if (e.keyCode === 167 /* Channel Down */) {
-            e.preventDefault();
-            changeChannelRelative(-1);
-            return;
-          }
-
           // Flecha Arriba (▲) o Flecha Izquierda (◄): acceso directo instantáneo a los botones superiores (Inicio / Último / Señal)
           if (e.key === "ArrowUp" || e.key === "ArrowLeft" || e.keyCode === 37) {
             e.preventDefault();
@@ -2753,10 +2764,12 @@
     };
 
     window.onAndroidChannelUp = function() {
+      if (m3uModal && m3uModal.style.display === "flex") return;
       changeChannelRelative(1);
     };
 
     window.onAndroidChannelDown = function() {
+      if (m3uModal && m3uModal.style.display === "flex") return;
       changeChannelRelative(-1);
     };
 

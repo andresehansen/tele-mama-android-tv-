@@ -503,21 +503,30 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (webView != null && event != null) {
+            int keyCode = event.getKeyCode();
+            boolean isChUp = (keyCode == KeyEvent.KEYCODE_CHANNEL_UP || keyCode == KeyEvent.KEYCODE_PAGE_UP);
+            boolean isChDown = (keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN || keyCode == KeyEvent.KEYCODE_PAGE_DOWN);
+            if (isChUp || isChDown) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                    String fn = isChUp
+                        ? "if(window.onAndroidChannelUp) window.onAndroidChannelUp();"
+                        : "if(window.onAndroidChannelDown) window.onAndroidChannelDown();";
+                    webView.evaluateJavascript(fn, null);
+                }
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (webView == null) return super.onKeyDown(keyCode, event);
 
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             handleBackKey();
-            return true;
-        }
-
-        if (keyCode == KeyEvent.KEYCODE_CHANNEL_UP) {
-            webView.evaluateJavascript("if(window.onAndroidChannelUp) window.onAndroidChannelUp();", null);
-            return true;
-        }
-
-        if (keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN) {
-            webView.evaluateJavascript("if(window.onAndroidChannelDown) window.onAndroidChannelDown();", null);
             return true;
         }
 
