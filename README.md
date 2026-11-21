@@ -40,7 +40,7 @@ Reproductor de uso **personal y privado** para Android TV, Google TV, Smart TVs 
 La disponibilidad de cada señal depende de su emisora y puede cambiar sin aviso.
 
 ## 🔄 Actualización remota
-La app instalada carga la versión publicada en `https://andresehansen.github.io/tele-mama-android-tv-/` y, si no hay conexión, usa la copia empaquetada en el APK. El botón **🔄 Actualizar** fuerza la recarga de `channels.json`.
+La app instalada carga la versión publicada en `https://tele-mama-android-tv.andresehansen2.workers.dev/` y, si no hay conexión, usa la copia empaquetada en el APK. El botón **🔄 Actualizar** fuerza la recarga de `channels.json`.
 
 ## 🧩 Fuentes comunitarias
 La sincronización automática con listas comunitarias (iptv-org) está **deshabilitada**. Las fuentes se curan manualmente en `channels.json`.

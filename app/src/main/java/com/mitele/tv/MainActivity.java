@@ -61,8 +61,8 @@ import java.util.Map;
 public class MainActivity extends Activity {
 
     private static final String TAG = "AndyTV";
-    // URL remota en GitHub Pages: permite que la app se actualice sola en la TV sin reinstalar el APK
-    private static final String REMOTE_APP_URL = "https://andresehansen.github.io/tele-mama-android-tv-/";
+    // URL remota en Cloudflare: permite que la app se actualice sola en la TV sin reinstalar el APK
+    private static final String REMOTE_APP_URL = "https://tele-mama-android-tv.andresehansen2.workers.dev/";
     private static final String LOCAL_FALLBACK_URL = "file:///android_asset/www/index.html";
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
