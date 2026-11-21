@@ -13,7 +13,7 @@ Reproductor de uso **personal y privado** para Android TV, Google TV, Smart TVs 
 - **Grilla modular (`channels.json`):** señales, números y categorías desacoplados del APK; se actualizan sin recompilar.
 - **Doble motor de reproducción:**
   - **AndroidX Media3 (ExoPlayer)** nativo con decodificación por hardware para HLS.
-  - **Reproductor web** (Hls.js) y **embeds oficiales de YouTube Live**, que se muestran tal cual los publica cada canal (sin saltear ni bloquear su publicidad).
+  - **Reproductor web** (Hls.js) y **embeds de YouTube Live**.
 - **Múltiples fuentes por canal** con cambio manual (tecla `S` / amarillo) y respaldo automático si una falla.
 - **Guía de programación (EPG)** aproximada: *Ahora* / *Luego* en cada tarjeta y barra OSD en el reproductor.
 - **Zapping con CH+ / CH-** del control remoto, recall al último canal (`0` / `R` / verde), teclado numérico multidígito y favoritos.
