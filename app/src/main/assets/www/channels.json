@@ -332,35 +332,8 @@
     "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#14532d\"/>\n            <path d=\"M50 20 C65 35 65 65 50 80 C35 65 35 35 50 20 Z\" fill=\"#84cc16\"/>\n            <text x=\"50\" y=\"88\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"12\" fill=\"#ffffff\" text-anchor=\"middle\">RURAL</text>\n          </svg>\n        "
   },
   {
-    "id": "tycsports",
-    "number": 12,
-    "category": "deportes",
-    "name": "TyC Sports",
-    "subtitle": "Argentina / Internacional",
-    "themeClass": "card-tycsports",
-    "type": "hls",
-    "currentSourceIndex": 0,
-    "sources": [
-      {
-        "label": "VodGC Oficial 1080p (AR)",
-        "type": "hls",
-        "url": "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8",
-        "useProxy": false
-      },
-      {
-        "label": "Amagi Global 1080p (Int/USA)",
-        "type": "hls",
-        "url": "https://amg26268-amg26268c14-freelivesports-emea-10267.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg26268-sportsstudio-tycsports-freelivesportsemea/playlist.m3u8",
-        "useProxy": false
-      }
-    ],
-    "hlsUrl": "https://live-04-11-tyc-app-web.vodgc.net/tyc24/index.m3u8",
-    "useProxy": false,
-    "logoSvg": "\n          <svg viewBox=\"0 0 100 100\">\n            <rect width=\"100\" height=\"100\" rx=\"20\" fill=\"#0c4a6e\"/>\n            <text x=\"50\" y=\"54\" font-family=\"sans-serif\" font-weight=\"900\" font-size=\"32\" fill=\"#ffffff\" text-anchor=\"middle\">TyC</text>\n            <text x=\"50\" y=\"80\" font-family=\"sans-serif\" font-weight=\"800\" font-size=\"15\" fill=\"#38bdf8\" text-anchor=\"middle\">SPORTS</text>\n          </svg>\n        "
-  },
-  {
     "id": "canal26",
-    "number": 13,
+    "number": 12,
     "category": "noticias",
     "name": "Canal 26",
     "subtitle": "Noticias en Vivo",
@@ -389,7 +362,7 @@
   },
   {
     "id": "fifaplus",
-    "number": 14,
+    "number": 13,
     "category": "deportes",
     "name": "FIFA+",
     "subtitle": "Fútbol y Archivo Oficial",
@@ -416,7 +389,7 @@
   },
   {
     "id": "quieromusica",
-    "number": 15,
+    "number": 14,
     "category": "entretenimiento",
     "name": "Quiero Música TV",
     "subtitle": "Música Argentina 24hs",

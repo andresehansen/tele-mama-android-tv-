@@ -217,8 +217,10 @@ public class MainActivity extends Activity {
                             return true;
                         }
                         // Si un iframe intenta redirigir la ventana principal a otro dominio, bloquearlo
+                        String remoteHost = Uri.parse(REMOTE_APP_URL).getHost();
+                        boolean isAllowedRemote = remoteHost != null && lower.contains(remoteHost.toLowerCase(Locale.ROOT));
                         if (request.isForMainFrame()
-                                && !lower.contains("andresehansen.github.io")
+                                && !isAllowedRemote
                                 && !lower.startsWith("file:///android_asset/")) {
                             Log.w(TAG, "Redirección externa bloqueada en frame principal: " + url);
                             return true;
@@ -235,6 +237,19 @@ public class MainActivity extends Activity {
                     if (request != null && request.isForMainFrame() && !usingFallback) {
                         usingFallback = true;
                         Log.w(TAG, "Fallo conexión remota, cargando respaldo local del APK");
+                        view.loadUrl(LOCAL_FALLBACK_URL);
+                    }
+                }
+
+                @Override
+                public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                    super.onReceivedHttpError(view, request, errorResponse);
+                    // Si la página remota devuelve 4xx/5xx (ej. 404 al pasar GitHub a privado),
+                    // cae automáticamente a la copia interna empaquetada en el APK
+                    if (request != null && request.isForMainFrame() && !usingFallback
+                            && errorResponse != null && errorResponse.getStatusCode() >= 400) {
+                        usingFallback = true;
+                        Log.w(TAG, "HTTP " + errorResponse.getStatusCode() + " en remoto, cargando respaldo local del APK");
                         view.loadUrl(LOCAL_FALLBACK_URL);
                     }
                 }

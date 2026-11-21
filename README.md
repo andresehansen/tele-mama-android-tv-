@@ -33,10 +33,9 @@ Reproductor de uso **personal y privado** para Android TV, Google TV, Smart TVs 
 | 9 | LN+ | Noticias |
 | 10 | Crónica | Noticias |
 | 11 | Canal Rural | Aire |
-| 12 | TyC Sports | Deportes |
-| 13 | Canal 26 | Noticias |
-| 14 | FIFA+ | Deportes |
-| 15 | Quiero Música TV | Entretenimiento |
+| 12 | Canal 26 | Noticias |
+| 13 | FIFA+ | Deportes |
+| 14 | Quiero Música TV | Entretenimiento |
 
 La disponibilidad de cada señal depende de su emisora y puede cambiar sin aviso.
 

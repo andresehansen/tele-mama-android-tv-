@@ -132,16 +132,6 @@
       [19.0, 21.0, "Cierre de Mercados Ganaderos y Granos"],
       [21.0, 24.0, "Especiales del Campo Argentino"]
     ],
-    tycsports: [
-      [0.0, 7.0, "TyC Sports Resumen y Goles"],
-      [7.0, 10.0, "Sportia Primera Edición"],
-      [10.0, 12.0, "Superfútbol en Vivo"],
-      [12.0, 14.0, "Sportia Mediodía"],
-      [14.0, 16.0, "Líbero"],
-      [16.0, 19.0, "Dale Al Medio / Fútbol en Vivo"],
-      [19.0, 22.0, "Presión Alta / La Noche de TyC"],
-      [22.0, 24.0, "Sportia Central"]
-    ],
     canal26: [
       [0.0, 6.0, "Canal 26 Trasnoche Internacional"],
       [6.0, 10.0, "26 Mañana"],
