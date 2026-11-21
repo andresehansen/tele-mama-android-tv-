@@ -66,9 +66,10 @@ public class MainActivity extends Activity {
     private static final String LOCAL_FALLBACK_URL = "file:///android_asset/www/index.html";
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
-    // Lista ligera de dominios de anuncios y popups bloqueados a nivel nativo (acelera carga de embeds deportivos)
+    // Lista ligera de redes de popups/redirecciones bloqueadas a nivel nativo (para embeds de terceros).
+    // No incluye la infraestructura publicitaria de Google/YouTube: los embeds de YouTube se muestran tal cual,
+    // respetando sus Términos de Servicio.
     private static final String[] AD_BLOCK_DOMAINS = {
-        "doubleclick.net", "googlesyndication.com", "googleadservices.com",
         "popads.net", "popcash.net", "propellerads.com", "adnxs.com",
         "exoclick.com", "juicyads.com", "realsrv.com", "histats.com",
         "acscdn.com", "usrpubtrk.com", "clickadu.com", "adsterra.com",

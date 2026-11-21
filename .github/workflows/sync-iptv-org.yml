@@ -1,36 +1,22 @@
-name: Sync iptv-org (diario)
+name: Sync iptv-org (deshabilitado)
+
+# La sincronización automática con listas comunitarias está deshabilitada.
+# Las fuentes se curan a mano en channels.json. Se puede correr manualmente
+# (python tools/sync_iptv_org.py --dry-run) solo para inspeccionar, sin escribir cambios.
 
 on:
-  schedule:
-    - cron: "17 6 * * *"   # todos los días 03:17 hora Argentina
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  sync:
+  dry-run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Sincronizar fuentes comunitarias (solo canales gratuitos, ver source-policy.json)
-        run: python tools/sync_iptv_org.py
-      - name: Tests
-        run: node --test
-      - name: Commit si hubo cambios
-        run: |
-          if git diff --quiet; then
-            echo "Sin cambios."
-          else
-            git config user.name "andytv-bot"
-            git config user.email "andytv-bot@users.noreply.github.com"
-            git add channels.json channels.js app/src/main/assets/www/channels.json app/src/main/assets/www/channels.js
-            git commit -m "chore: sync diario de fuentes iptv-org"
-            git push
-          fi
+      - name: Inspección (no escribe nada)
+        run: python tools/sync_iptv_org.py --dry-run

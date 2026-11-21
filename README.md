@@ -1,53 +1,52 @@
-# 📺 AndyTV — Aplicación para Android TV / Google TV
+# 📺 AndyTV — Reproductor personal para Android TV / Google TV
 
-Aplicación de televisión argentina en vivo diseñada específicamente para **Android TV, Google TV, Smart TVs y TV Boxes (Chromecast con Google TV, Xiaomi Mi Box, etc.)**, optimizada con navegación 100% mediante control remoto.
+Reproductor de uso **personal y privado** para Android TV, Google TV, Smart TVs y TV Boxes, con navegación completa por control remoto.
 
-## 🚀 Características Principales
-- **Arquitectura Modular con `channels.json`:** Las señales, números y categorías se gestionan de forma desacoplada en JSON. Podés actualizar la grilla de canales sin recompilar el APK.
-- **Doble Motor de Reproducción:**
-  - **AndroidX Media3 (ExoPlayer) Nativo:** Decodificación por hardware de alto rendimiento habilitada por defecto en Android TV para transmisiones HLS directas con mínimo consumo.
-  - **Player Web Seguro & YouTube Live:** Integración oficial con escudos anti-popups y sin publicidad intrusiva.
-- **Guía de Programación Electrónica (EPG) en Vivo:**
-  - **En Pantalla de Inicio:** Vista previa de programa en vivo actual (*Ahora*) y siguiente (*Luego*) con horario en cada tarjeta.
-  - **Barra OSD Inferior en el Reproductor:** Despliega canal, nombre del programa, horario, barra de progreso en tiempo real y próximo programa (accesible con flecha abajo, tecla INFO o al cambiar de canal).
-- **Función Último Canal (Recall):**
-  - Botón dedicado `↩ Último` en la barra superior.
-  - Atajo rápido con tecla `0`, `R` o botón Verde del control remoto para alternar al instante entre dos señales.
-- **Retomar Último Canal al Iniciar:** Al abrir la aplicación, sintoniza automáticamente la última señal vista emulando un televisor tradicional.
-- **Teclado Numérico Multidígito Mejorado:**
-  - Buffer de 1.5 segundos con confirmación visual en pantalla para sintonizar canales de 1 y 2 dígitos (ej: canal 14).
-- **Navegación 100% Optimizada para Control Remoto:**
-  - **Flechas Laterales (◄ / ►):** Acceso instantáneo a los botones superiores (Inicio, Recall, Cambiar Señal, Ajustar Relación de Aspecto, Favoritos).
-  - **Flechas Arriba / Abajo (▲ / ▼):** Navegación fluida y natural entre canales de la guía lateral.
-  - **Botón Atrás (Back):** Oculta la guía y los menús volviendo a pantalla completa.
-- **Contadores Dinámicos:** Los filtros de categorías (Todos, Favoritos, Aire, Noticias, Deportes) se calculan automáticamente desde la lista de canales.
+> [!IMPORTANT]
+> **Aviso legal.** AndyTV es un proyecto personal, sin fines de lucro, para uso privado del autor y un grupo reducido de allegados. **No está afiliado, patrocinado ni avalado** por ninguno de los canales o emisoras que aparecen en la grilla. Todas las marcas, nombres y logos pertenecen a sus respectivos titulares y se usan únicamente para identificar cada señal.
+>
+> AndyTV **no aloja, almacena ni vende contenido audiovisual**: solo organiza y reproduce transmisiones que los propios canales publican en internet. No se distribuye en tiendas de aplicaciones ni se comercializa.
+>
+> **Pedidos de baja:** si sos titular de derechos y querés que se quite una señal, abrí un *issue* en este repositorio y se retira a la brevedad.
 
----
+## 🚀 Características
+- **Grilla modular (`channels.json`):** señales, números y categorías desacoplados del APK; se actualizan sin recompilar.
+- **Doble motor de reproducción:**
+  - **AndroidX Media3 (ExoPlayer)** nativo con decodificación por hardware para HLS.
+  - **Reproductor web** (Hls.js) y **embeds oficiales de YouTube Live**, que se muestran tal cual los publica cada canal (sin saltear ni bloquear su publicidad).
+- **Múltiples fuentes por canal** con cambio manual (tecla `S` / amarillo) y respaldo automático si una falla.
+- **Guía de programación (EPG)** aproximada: *Ahora* / *Luego* en cada tarjeta y barra OSD en el reproductor.
+- **Zapping con CH+ / CH-** del control remoto, recall al último canal (`0` / `R` / verde), teclado numérico multidígito y favoritos.
+- **Lista M3U propia:** permite cargar una lista personal del usuario (como cualquier reproductor genérico tipo VLC).
 
-## 📋 Lista de Canales Incluidos (14 Señales Oficiales)
+## 📋 Grilla
+| # | Canal | Categoría |
+|---|---|---|
+| 1 | TN | Noticias |
+| 2 | Telefe | Aire |
+| 3 | C5N | Noticias |
+| 4 | El Trece | Aire |
+| 5 | El Nueve | Aire |
+| 6 | América TV | Aire |
+| 7 | A24 | Noticias |
+| 8 | TV Pública | Aire |
+| 9 | LN+ | Noticias |
+| 10 | Crónica | Noticias |
+| 11 | Canal Rural | Aire |
+| 12 | TyC Sports | Deportes |
+| 13 | Canal 26 | Noticias |
+| 14 | FIFA+ | Deportes |
+| 15 | Quiero Música TV | Entretenimiento |
 
-### 📡 Aire y Noticias
-1. **TN (Todo Noticias)** — HLS Nativo 1080p Artear
-2. **Telefe (Canal 11)** — Token API Oficial Mediastream 1080p
-3. **C5N (Noticias 24hs)** — YouTube Live Oficial
-4. **El Trece (Canal 13)** — HLS Nativo 1080p VodGC
-5. **El Nueve (Canal 9)** — YouTube Live Oficial
-6. **América TV (Canal 2)** — HLS HD Oficial Google DAI / YouTube Live
-7. **A24 (América 24)** — YouTube Live Oficial / Fallback HLS
-8. **TV Pública (Canal 7)** — YouTube Live Oficial
-9. **LN+ (La Nación +)** — YouTube Live Oficial
-10. **Crónica TV** — YouTube Live Oficial
-11. **Canal Rural** — YouTube Live Oficial
-13. **Canal 26** — YouTube Live Oficial 24/7
+La disponibilidad de cada señal depende de su emisora y puede cambiar sin aviso.
 
-### ⚽ Deportes
-12. **TyC Sports** — HLS 1080p Oficial (AR / Internacional)
-14. **FIFA+** — HLS FAST Oficial (Español / Global)
+## 🔄 Actualización remota
+La app instalada carga la versión publicada en `https://andresehansen.github.io/tele-mama-android-tv-/` y, si no hay conexión, usa la copia empaquetada en el APK. El botón **🔄 Actualizar** fuerza la recarga de `channels.json`.
 
----
+## 🧩 Fuentes comunitarias
+La sincronización automática con listas comunitarias (iptv-org) está **deshabilitada**. Las fuentes se curan manualmente en `channels.json`.
 
-## 🔄 Actualización Remota OTA (Over-The-Air)
-La aplicación instalada en tu televisor consulta automáticamente la versión actualizada alojada en GitHub:
-`https://andresehansen.github.io/tele-mama-android-tv-/`
-
-Al presionar el botón **🔄 Actualizar** en el menú superior o abrir la aplicación, se descargan los canales más recientes desde `channels.json` sin necesidad de reinstalar.
+## 📄 Licencias
+- Código propio: [MIT](LICENSE).
+- [hls.js](https://github.com/video-dev/hls.js) — Apache License 2.0.
+- [AndroidX Media3](https://github.com/androidx/media) — Apache License 2.0.

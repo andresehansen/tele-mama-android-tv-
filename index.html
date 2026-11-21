@@ -1072,7 +1072,7 @@
         <div class="hint-item"><span class="key-badge" id="hint-direct-numbers">1 - 12</span> Número directo</div>
         <div class="hint-item"><span class="key-badge">S / AMARILLO</span> Cambiar Señal</div>
       </div>
-      <div id="sync-status-badge" style="color: #38bdf8; font-weight: 800;">🟢 Auto-Sync Activo</div>
+      <div id="sync-status-badge" style="color: #38bdf8; font-weight: 800;">Uso personal · Sin afiliación con los canales</div>
     </footer>
   </main>
 
@@ -1160,9 +1160,6 @@
             </button>
             <button class="btn-tv-control" id="btn-toggle-fav" style="background: #1e293b; color: #facc15;" tabindex="0">
               ☆ Favorito
-            </button>
-            <button class="btn-tv-control" id="btn-skip-ad" style="display: none; background: #38bdf8; color: #000000;" tabindex="0">
-              ⏭️ Saltear Anuncio
             </button>
           </div>
           
@@ -1627,7 +1624,6 @@
     const playerChannelName = document.getElementById("player-channel-name");
     const btnBack = document.getElementById("btn-back");
     const btnRecall = document.getElementById("btn-recall");
-    const btnSkipAd = document.getElementById("btn-skip-ad");
     const playerOsdBottom = document.getElementById("player-osd-bottom");
     const osdChannelNum = document.getElementById("osd-channel-num");
     const osdChannelName = document.getElementById("osd-channel-name");
@@ -2128,7 +2124,6 @@
       iframe.style.display = "none";
 
       const sourceType = source.type || channel.type;
-      btnSkipAd.style.display = (sourceType === "youtube-live") ? "inline-flex" : "none";
 
       if (sourceType === "youtube-live") {
         setReferrerPolicy("strict-origin-when-cross-origin");
@@ -2323,19 +2318,6 @@
     }
 
     btnBack.addEventListener("click", closePlayer);
-
-    // Botón para saltear publicidad en YouTube
-    btnSkipAd.addEventListener("click", () => {
-      const channel = CHANNELS[currentIndex];
-      const source = getCurrentSource(channel);
-      if (source && source.type === "youtube-live") {
-        showLoading("Quitando anuncio...");
-        const vId = source.ytVideoId || channel.ytVideoId;
-        iframe.src = buildYtEmbedUrl(vId) + "&t=" + Date.now();
-        setTimeout(() => hideLoading(), 900);
-        resetOverlayTimer();
-      }
-    });
 
     /* ==========================================================================
        6. MODAL Y PARSER M3U AVANZADO (#EXTVLCOPT / HEADERS HTTP)
@@ -2637,7 +2619,7 @@
 
       // En el reproductor: navegación por control remoto y acceso directo a controles
       if (isPlayerOpen) {
-        const topBtns = [btnBack, btnRecall, btnSwitchSource, btnAspectRatio, btnToggleFav, btnSkipAd]
+        const topBtns = [btnBack, btnRecall, btnSwitchSource, btnAspectRatio, btnToggleFav]
           .filter(b => b && b.style.display !== "none");
         const sideBtns = Array.from(channelBar.querySelectorAll(".btn-bar-channel"));
         const active = document.activeElement;
@@ -2973,7 +2955,6 @@
         if (window.AndroidBridge && typeof window.AndroidBridge.reloadRemoteApp === "function") {
           window.AndroidBridge.reloadRemoteApp();
         } else {
-          syncIptvOrgSources(true);
           setTimeout(() => {
             btnSyncCloud.textContent = "🔄 Actualizar";
           }, 1500);
@@ -3012,10 +2993,8 @@
       if (targetCard) targetCard.focus();
       loadSavedCustomM3uSilently();
       startSourceHealth(3500);
-      setTimeout(async () => {
-        if (window.AndySourceHealth) await AndySourceHealth.loadPolicy();
-        syncIptvOrgSources(false);
-      }, 1500);
+      // Sincronización automática con listas comunitarias (iptv-org) deshabilitada:
+      // solo se usan las fuentes curadas de channels.json y la lista M3U propia del usuario.
     }
 
     if (document.readyState === "loading") {
